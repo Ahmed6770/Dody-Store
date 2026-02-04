@@ -624,7 +624,8 @@
 window.DODY_API_BASE = "api";
 window.DODY_BACKEND = "supabase";
 window.DODY_SUPABASE = {
-  url: "https://pttzwbyjierbcktjdzp.supabase.co",
-  anonKey: "sb_publishable_QKSn5CqqIhC_-_mzJfS2ow_uQ2nR",
+  url: "https://pttzwbjyiebrcktjdjzp.supabase.co",
+  anonKey:
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB0dHp3Ymp5aWVicmNrdGpkanpwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyMTYyMjgsImV4cCI6MjA4NTc5MjIyOH0.hzAHqiCRP4wChK1OJ4MBAlFXnbH2MZcYM6uFAxdlJOY",
   adminPin: localStorage.getItem("dodySupabasePin") || "2026"
 };
