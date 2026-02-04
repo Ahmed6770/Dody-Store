@@ -74,6 +74,7 @@ const i18n = {
 };
 
 let lang = localStorage.getItem("dodyDashLang") || "ar";
+let storeData = deepClone(defaultData);
 let currentOrder = null;
 
 const t = (key) => i18n[lang]?.[key] || key;
@@ -88,32 +89,51 @@ const formatPhone = (value) => {
   return digits;
 };
 
-const loadStoreData = () => {
+const defaultData = window.DODY_DEFAULT_DATA || {};
+const deepClone = (data) => JSON.parse(JSON.stringify(data));
+
+const mergeDeep = (target, source) => {
+  if (!source) {
+    return target;
+  }
+  Object.keys(source).forEach((key) => {
+    const value = source[key];
+    if (Array.isArray(value)) {
+      target[key] = value;
+    } else if (value && typeof value === "object") {
+      target[key] = mergeDeep(target[key] || {}, value);
+    } else {
+      target[key] = value;
+    }
+  });
+  return target;
+};
+
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
   const raw = localStorage.getItem("dodyStoreData");
   if (!raw) {
-    return null;
+    return deepClone(defaultData);
   }
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return mergeDeep(deepClone(defaultData), parsed);
   } catch (error) {
-    return null;
+    return deepClone(defaultData);
   }
 };
 
-const loadOrders = () => {
-  const raw = localStorage.getItem("dodyOrders");
-  if (!raw) {
-    return [];
-  }
-  try {
-    return JSON.parse(raw);
-  } catch (error) {
-    return [];
-  }
-};
-
-const saveOrders = (orders) => {
-  localStorage.setItem("dodyOrders", JSON.stringify(orders));
+const fetchOrders = async () => {
+  const orders = await window.DodyApi?.fetchOrders?.();
+  return Array.isArray(orders) ? orders : [];
 };
 
 const updateStatusOptions = () => {
@@ -233,23 +253,29 @@ const applyLang = () => {
 
   const favicon = document.getElementById("siteFavicon");
   if (favicon) {
-    const stored = loadStoreData();
-    favicon.href = stored?.brand?.favicon || stored?.brand?.logo || "assets/logo.svg";
+    favicon.href = storeData?.brand?.favicon || storeData?.brand?.logo || "assets/logo.svg";
   }
 
   document.title = `${t("pageTitle")} | Dody Store`;
   renderOrder();
 };
 
-const init = () => {
+const init = async () => {
+  const authed = await window.DodyApi?.checkAuth?.();
+  if (!authed) {
+    window.location.href = "orders.html";
+    return;
+  }
+
+  storeData = await loadStoreData();
+
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get("id");
-  const orders = loadOrders();
+  const orders = await fetchOrders();
   currentOrder = orders.find((order) => order.id === orderId) || null;
 
-  const stored = loadStoreData();
-  if (brandLogo && stored?.brand?.logo) {
-    brandLogo.src = stored.brand.logo;
+  if (brandLogo && storeData?.brand?.logo) {
+    brandLogo.src = storeData.brand.logo;
   }
 
   if (detailsLangToggle) {
@@ -261,31 +287,31 @@ const init = () => {
   }
 
   if (orderStatusEl) {
-    orderStatusEl.addEventListener("change", () => {
+    orderStatusEl.addEventListener("change", async () => {
       if (!currentOrder) {
         return;
       }
-      const updated = loadOrders();
-      const match = updated.find((order) => order.id === currentOrder.id);
-      if (match) {
-        match.status = orderStatusEl.value;
-        currentOrder.status = orderStatusEl.value;
-        saveOrders(updated);
+      const updated = await window.DodyApi?.updateOrder?.(currentOrder.id, {
+        status: orderStatusEl.value
+      });
+      if (updated) {
+        currentOrder = updated;
+        renderOrder();
       }
     });
   }
 
   if (shippingStatusEl) {
-    shippingStatusEl.addEventListener("change", () => {
+    shippingStatusEl.addEventListener("change", async () => {
       if (!currentOrder) {
         return;
       }
-      const updated = loadOrders();
-      const match = updated.find((order) => order.id === currentOrder.id);
-      if (match) {
-        match.shippingStatus = shippingStatusEl.value;
-        currentOrder.shippingStatus = shippingStatusEl.value;
-        saveOrders(updated);
+      const updated = await window.DodyApi?.updateOrder?.(currentOrder.id, {
+        shippingStatus: shippingStatusEl.value
+      });
+      if (updated) {
+        currentOrder = updated;
+        renderOrder();
       }
     });
   }
@@ -296,33 +322,39 @@ const init = () => {
         return;
       }
       const fee = Number(deliveryFeeInput.value) || 0;
-      const updated = loadOrders();
-      const match = updated.find((order) => order.id === currentOrder.id);
-      if (match) {
-        match.deliveryFee = fee;
-        currentOrder.deliveryFee = fee;
-        saveOrders(updated);
-      }
       const total = Number(currentOrder.total) || 0;
       const net = Math.max(total - fee, 0);
       if (orderNetEl) {
         orderNetEl.textContent = formatCurrency(net);
       }
     });
+    deliveryFeeInput.addEventListener("change", async () => {
+      if (!currentOrder) {
+        return;
+      }
+      const fee = Number(deliveryFeeInput.value) || 0;
+      const updated = await window.DodyApi?.updateOrder?.(currentOrder.id, {
+        deliveryFee: fee
+      });
+      if (updated) {
+        currentOrder = updated;
+        renderOrder();
+      }
+    });
   }
 
   if (removeOrderBtn) {
-    removeOrderBtn.addEventListener("click", () => {
+    removeOrderBtn.addEventListener("click", async () => {
       if (!currentOrder) {
         return;
       }
       if (!confirm(t("confirmRemoveOrder"))) {
         return;
       }
-      const updated = loadOrders();
-      const filtered = updated.filter((order) => order.id !== currentOrder.id);
-      saveOrders(filtered);
-      window.location.href = "orders.html";
+      const ok = await window.DodyApi?.deleteOrder?.(currentOrder.id);
+      if (ok) {
+        window.location.href = "orders.html";
+      }
     });
   }
 

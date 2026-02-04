@@ -21,7 +21,16 @@ const mergeDeep = (target, source) => {
   return target;
 };
 
-const loadStoreData = () => {
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
   const saved = localStorage.getItem("dodyStoreData");
   if (!saved) {
     return deepClone(defaultData);
@@ -34,7 +43,7 @@ const loadStoreData = () => {
   }
 };
 
-let storeData = loadStoreData();
+let storeData = deepClone(defaultData);
 
 let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 const dashI18n = {
@@ -67,6 +76,7 @@ const dashI18n = {
     logout: "تسجيل خروج",
     saveAll: "حفظ التغييرات",
     saveSuccess: "تم حفظ التغييرات بنجاح ✔",
+    saveError: "فشل حفظ التغييرات. جرّب مرة أخرى.",
     importSuccess: "تم استيراد البيانات بنجاح ✔",
     importError: "فشل استيراد البيانات. تأكد من الملف.",
     generalSettings: "الإعدادات العامة",
@@ -75,6 +85,7 @@ const dashI18n = {
     storeTagEn: "وصف المتجر (إنجليزي)",
     whatsappDisplay: "واتساب (عرض)",
     whatsappIntl: "واتساب دولي (بدون +)",
+    ordersEmailLabel: "إيميل استقبال الطلبات",
     instagramLabel: "إنستجرام",
     hoursAr: "ساعات العمل (عربي)",
     hoursEn: "ساعات العمل (إنجليزي)",
@@ -275,6 +286,7 @@ const dashI18n = {
     logout: "Logout",
     saveAll: "Save changes",
     saveSuccess: "Changes saved ✔",
+    saveError: "Failed to save changes. Please try again.",
     importSuccess: "Data imported ✔",
     importError: "Import failed. Check the file.",
     generalSettings: "General settings",
@@ -283,6 +295,7 @@ const dashI18n = {
     storeTagEn: "Store tagline (EN)",
     whatsappDisplay: "WhatsApp (display)",
     whatsappIntl: "WhatsApp international (no +)",
+    ordersEmailLabel: "Orders inbox email",
     instagramLabel: "Instagram",
     hoursAr: "Working hours (AR)",
     hoursEn: "Working hours (EN)",
@@ -532,9 +545,10 @@ const showGate = (show) => {
   adminGate.setAttribute("aria-hidden", (!show).toString());
 };
 
-const checkAuth = () => {
-  const authed = localStorage.getItem("dodyAdminAuth") === "true";
+const checkAuth = async () => {
+  const authed = await window.DodyApi?.checkAuth?.();
   showGate(!authed);
+  return authed;
 };
 
 const setSaveNote = (stateKey, color) => {
@@ -1233,15 +1247,20 @@ const renderStats = () => {
   statsInputs.innerHTML = "";
   (storeData.about?.stats || []).forEach((stat) => addStatRow(stat));
 };
-const loadOrders = () => {
-  const raw = localStorage.getItem("dodyOrders");
-  if (!raw) {
-    return [];
+let ordersCache = [];
+const loadOrders = () => ordersCache;
+const setOrders = (orders) => {
+  ordersCache = Array.isArray(orders) ? orders : [];
+};
+const updateOrderCache = (order) => {
+  if (!order || !order.id) {
+    return;
   }
-  try {
-    return JSON.parse(raw);
-  } catch (error) {
-    return [];
+  const index = ordersCache.findIndex((item) => item.id === order.id);
+  if (index === -1) {
+    ordersCache.unshift(order);
+  } else {
+    ordersCache[index] = order;
   }
 };
 
@@ -1334,12 +1353,24 @@ const renderOrders = () => {
   });
 };
 
+const refreshOrders = async () => {
+  const orders = await window.DodyApi?.fetchOrders?.();
+  if (Array.isArray(orders)) {
+    setOrders(orders);
+  } else {
+    setOrders([]);
+  }
+  renderSummary();
+  renderOrders();
+};
+
 const fillInputs = () => {
   setValue("brandNameInput", storeData.brand?.name || "");
   setValue("brandTagArInput", storeData.brand?.tag?.ar || "");
   setValue("brandTagEnInput", storeData.brand?.tag?.en || "");
   setValue("whatsappDisplayInput", storeData.footer?.contact?.whatsappDisplay || "");
   setValue("whatsappIntlInput", storeData.footer?.contact?.whatsappIntl || "");
+  setValue("ordersEmailInput", storeData.orders?.email || "");
   setValue("instagramInput", storeData.footer?.contact?.instagram || "");
   setValue("hoursArInput", storeData.footer?.hours?.ar || "");
   setValue("hoursEnInput", storeData.footer?.hours?.en || "");
@@ -1348,7 +1379,7 @@ const fillInputs = () => {
   setValue("homeSamplesInput", storeData.home?.samplesCount ?? 6);
   setValue("footerDescArInput", storeData.footer?.desc?.ar || "");
   setValue("footerDescEnInput", storeData.footer?.desc?.en || "");
-  setValue("adminPinSetting", storeData.admin?.pin || "");
+  setValue("adminPinSetting", "");
   setValue("contactCtaTitleArInput", storeData.contactCta?.title?.ar || "");
   setValue("contactCtaTitleEnInput", storeData.contactCta?.title?.en || "");
   setValue("contactCtaDescArInput", storeData.contactCta?.desc?.ar || "");
@@ -1430,8 +1461,28 @@ const fillInputs = () => {
   setValue("aboutCardMessageEnInput", storeData.about?.card?.message?.en || "");
 };
 
-const saveAll = () => {
-  const updated = loadStoreData();
+const saveAll = async () => {
+  const updated = mergeDeep(deepClone(defaultData), storeData);
+
+  updated.brand = updated.brand || { name: "", logo: "", favicon: "", tag: { ar: "", en: "" } };
+  updated.brand.tag = updated.brand.tag || { ar: "", en: "" };
+  updated.footer = updated.footer || {
+    desc: { ar: "", en: "" },
+    services: [],
+    contact: { whatsappDisplay: "", whatsappIntl: "", instagram: "" },
+    hours: { ar: "", en: "" }
+  };
+  updated.footer.contact = updated.footer.contact || {
+    whatsappDisplay: "",
+    whatsappIntl: "",
+    instagram: ""
+  };
+  updated.footer.desc = updated.footer.desc || { ar: "", en: "" };
+  updated.footer.hours = updated.footer.hours || { ar: "", en: "" };
+  updated.orders = updated.orders || {};
+  updated.delivery = updated.delivery || { time: { ar: "", en: "" } };
+  updated.delivery.time = updated.delivery.time || { ar: "", en: "" };
+  updated.home = updated.home || {};
 
   updated.brand.name = getValue("brandNameInput");
   updated.brand.tag.ar = getValue("brandTagArInput");
@@ -1453,18 +1504,22 @@ const saveAll = () => {
 
   const newPin = getValue("adminPinSetting");
   if (newPin) {
-    updated.admin.pin = newPin;
+    const pinOk = await window.DodyApi?.updatePin?.(newPin);
+    if (!pinOk) {
+      setSaveNote("saveError", "#b24b47");
+      return;
+    }
+    setValue("adminPinSetting", "");
   }
 
   updated.footer.contact.whatsappDisplay = getValue("whatsappDisplayInput");
   updated.footer.contact.whatsappIntl = getValue("whatsappIntlInput");
+  updated.orders.email = getValue("ordersEmailInput");
   updated.footer.contact.instagram = getValue("instagramInput");
   updated.footer.hours.ar = getValue("hoursArInput");
   updated.footer.hours.en = getValue("hoursEnInput");
-  updated.delivery = updated.delivery || { time: { ar: "", en: "" } };
   updated.delivery.time.ar = getValue("deliveryTimeArInput");
   updated.delivery.time.en = getValue("deliveryTimeEnInput");
-  updated.home = updated.home || {};
   updated.home.samplesCount = Number(getValue("homeSamplesInput")) || 6;
   updated.footer.desc.ar = getValue("footerDescArInput");
   updated.footer.desc.en = getValue("footerDescEnInput");
@@ -1670,6 +1725,15 @@ const saveAll = () => {
       en: row.querySelector("[data-field='label.en']").value.trim()
     }
   }));
+  if (updated.admin) {
+    delete updated.admin;
+  }
+
+  const ok = await window.DodyApi?.saveStoreData?.(updated);
+  if (!ok) {
+    setSaveNote("saveError", "#b24b47");
+    return;
+  }
 
   localStorage.setItem("dodyStoreData", JSON.stringify(updated));
   storeData = updated;
@@ -1774,6 +1838,11 @@ const importData = async (file) => {
   try {
     const text = await file.text();
     const parsed = JSON.parse(text);
+    const ok = await window.DodyApi?.saveStoreData?.(parsed);
+    if (!ok) {
+      setSaveNote("importError", "#b24b47");
+      return;
+    }
     localStorage.setItem("dodyStoreData", JSON.stringify(parsed));
     storeData = mergeDeep(deepClone(defaultData), parsed);
     fillInputs();
@@ -1816,9 +1885,13 @@ const bindEvents = () => {
   }
   const clearOrdersBtn = document.getElementById("clearOrders");
   if (clearOrdersBtn) {
-    clearOrdersBtn.addEventListener("click", () => {
-      if (confirm(t("confirmClearOrders"))) {
-        localStorage.removeItem("dodyOrders");
+    clearOrdersBtn.addEventListener("click", async () => {
+      if (!confirm(t("confirmClearOrders"))) {
+        return;
+      }
+      const ok = await window.DodyApi?.clearOrders?.();
+      if (ok) {
+        setOrders([]);
         renderOrders();
         renderSummary();
       }
@@ -1833,15 +1906,15 @@ const bindEvents = () => {
   }
 
   if (adminPinBtn) {
-    adminPinBtn.addEventListener("click", () => {
+    adminPinBtn.addEventListener("click", async () => {
       const pin = adminPinInput.value.trim();
-      const realPin = storeData.admin?.pin || "2026";
-      if (pin === realPin) {
-        localStorage.setItem("dodyAdminAuth", "true");
+      const ok = await window.DodyApi?.login?.(pin);
+      if (ok) {
         adminPinInput.value = "";
         adminPinHint.dataset.i18n = "adminHint";
         adminPinHint.textContent = "";
         showGate(false);
+        await refreshOrders();
       } else {
         adminPinHint.dataset.i18n = "adminPinError";
         adminPinHint.textContent = t("adminPinError");
@@ -1850,8 +1923,8 @@ const bindEvents = () => {
   }
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      localStorage.removeItem("dodyAdminAuth");
+    logoutBtn.addEventListener("click", async () => {
+      await window.DodyApi?.logout?.();
       showGate(true);
     });
   }
@@ -2077,14 +2150,13 @@ const bindEvents = () => {
   });
 
   if (ordersTable) {
-    ordersTable.addEventListener("change", (event) => {
+    ordersTable.addEventListener("change", async (event) => {
       const target = event.target;
       if (target.matches("select[data-order-id]")) {
-        const orders = loadOrders();
-        const order = orders.find((item) => item.id === target.dataset.orderId);
-        if (order) {
-          order.status = target.value;
-          localStorage.setItem("dodyOrders", JSON.stringify(orders));
+        const orderId = target.dataset.orderId;
+        const updated = await window.DodyApi?.updateOrder?.(orderId, { status: target.value });
+        if (updated) {
+          updateOrderCache(updated);
           renderOrders();
           renderSummary();
         }
@@ -2122,13 +2194,18 @@ const renderAll = () => {
   refreshProductOptions();
 };
 
-const init = () => {
-  checkAuth();
+const init = async () => {
+  const authed = await checkAuth();
+  storeData = await loadStoreData();
   fillInputs();
   renderAll();
   bindEvents();
   setSaveNote("saveNote", "");
   applyDashLang();
+
+  if (authed) {
+    await refreshOrders();
+  }
 
   const hash = window.location.hash?.replace("#", "");
   if (hash) {

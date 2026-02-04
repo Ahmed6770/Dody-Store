@@ -24,7 +24,17 @@ const mergeDeep = (target, source) => {
   return target;
 };
 
-const loadStoreData = () => {
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
+
   const saved = localStorage.getItem("dodyStoreData");
   if (!saved) {
     return deepClone(defaultData);
@@ -38,7 +48,7 @@ const loadStoreData = () => {
   }
 };
 
-let storeData = loadStoreData();
+let storeData = deepClone(defaultData);
 let storeWhatsApp = storeData.footer?.contact?.whatsappIntl || "201123456789";
 
 const translations = {
@@ -81,7 +91,7 @@ const translations = {
     notesLabel: "ملاحظات (اختياري)",
     paymentLabel: "طريقة الدفع",
     placeOrder: "تأكيد الطلب",
-    orderHint: "بعد التأكيد سيتم فتح واتساب لإرسال تفاصيل الطلب.",
+    orderHint: "بعد التأكيد هنستلم طلبك وهنبعت لك تأكيد.",
     namePlaceholder: "اسمك بالكامل",
     phonePlaceholder: "رقم الهاتف",
     addressPlaceholder: "المنطقة - الشارع - رقم العمارة",
@@ -100,8 +110,10 @@ const translations = {
     outOfStock: "غير متاح",
     orderErrorEmpty: "ضيفي منتجات للسلة أولاً.",
     orderErrorFields: "من فضلك اكملي البيانات المطلوبة.",
-    orderSuccess: "تم تجهيز الطلب وسيتم فتح واتساب لإرسال التفاصيل.",
-    orderSuccessWithId: "تم تجهيز طلبك رقم {id}. سيتم فتح واتساب الآن لإرسال التفاصيل.",
+    orderSuccess: "تم استلام الطلب بنجاح.",
+    orderSuccessWithId: "تم استلام طلبك رقم {id}.",
+    orderSending: "جاري إرسال الطلب...",
+    orderFailed: "حصل خطأ أثناء إرسال الطلب. جرّبي مرة أخرى.",
     copyright: "© 2026 Dody Store. كل الحقوق محفوظة."
   },
   en: {
@@ -143,7 +155,7 @@ const translations = {
     notesLabel: "Notes (optional)",
     paymentLabel: "Payment method",
     placeOrder: "Place order",
-    orderHint: "After confirmation, WhatsApp will open to send the order details.",
+    orderHint: "After confirmation, we'll receive your order and follow up.",
     namePlaceholder: "Your full name",
     phonePlaceholder: "Your phone number",
     addressPlaceholder: "Street, area, city",
@@ -162,8 +174,10 @@ const translations = {
     outOfStock: "Unavailable",
     orderErrorEmpty: "Please add items to the cart first.",
     orderErrorFields: "Please fill in the required fields.",
-    orderSuccess: "Order prepared. WhatsApp will open to send the details.",
-    orderSuccessWithId: "Order #{id} is ready. WhatsApp will open to send the details.",
+    orderSuccess: "Order received successfully.",
+    orderSuccessWithId: "Order #{id} received successfully.",
+    orderSending: "Sending order...",
+    orderFailed: "Something went wrong. Please try again.",
     copyright: "© 2026 Dody Store. All rights reserved."
   }
 };
@@ -216,6 +230,7 @@ const giftTitle = document.getElementById("giftTitle");
 const giftDesc = document.getElementById("giftDesc");
 const giftWhatsAppBtn = document.getElementById("giftWhatsAppBtn");
 const giftShopBtn = document.getElementById("giftShopBtn");
+const emailFormMount = document.getElementById("emailFormMount");
 const contactCtaTitle = document.getElementById("contactCtaTitle");
 const contactCtaDesc = document.getElementById("contactCtaDesc");
 const contactCtaBtn = document.getElementById("contactCtaBtn");
@@ -915,6 +930,135 @@ const openProductQuestion = (button) => {
   window.open(url, "_blank");
 };
 
+const getOrdersEmail = (data) => {
+  const raw = data?.orders?.email || "";
+  const email = raw.trim();
+  return email.includes("@") ? email : "";
+};
+
+const buildOrderEmailItems = (items) =>
+  (items || [])
+    .map((item) => {
+      const name = currentLang === "ar" ? item.nameAr || item.nameEn : item.nameEn || item.nameAr;
+      const total = (item.price || 0) * (item.qty || 0);
+      return `- ${name} x${item.qty} (${formatCurrency(total)})`;
+    })
+    .join("\n");
+
+const buildOrderEmailSubject = (orderId) => {
+  const storeName = storeData.brand?.name || "Dody Store";
+  if (currentLang === "ar") {
+    return `طلب جديد #${orderId} - ${storeName}`;
+  }
+  return `New order #${orderId} - ${storeName}`;
+};
+
+const buildOrderEmailMessage = (formData, order) => {
+  const itemsText = buildOrderEmailItems(order.items);
+  if (currentLang === "ar") {
+    return [
+      `طلب جديد من ${storeData.brand?.name || "Dody Store"}`,
+      `رقم الطلب: ${order.id}`,
+      `الاسم: ${formData.name}`,
+      `الهاتف: ${formData.phone}`,
+      `العنوان: ${formData.address}`,
+      formData.notes ? `ملاحظات: ${formData.notes}` : "ملاحظات: لا يوجد",
+      "المنتجات:",
+      itemsText,
+      `الإجمالي: ${formatCurrency(order.total || 0)}`,
+      `الدفع: ${translations[currentLang].paymentValue}`
+    ].join("\n");
+  }
+
+  return [
+    `New order from ${storeData.brand?.name || "Dody Store"}`,
+    `Order ID: ${order.id}`,
+    `Name: ${formData.name}`,
+    `Phone: ${formData.phone}`,
+    `Address: ${formData.address}`,
+    formData.notes ? `Notes: ${formData.notes}` : "Notes: None",
+    "Items:",
+    itemsText,
+    `Total: ${formatCurrency(order.total || 0)}`,
+    `Payment: ${translations[currentLang].paymentValue}`
+  ].join("\n");
+};
+
+const buildEmailFormMarkup = () => `
+  <div class="email-order-helper" id="emailOrderHelper" aria-hidden="true">
+    <form id="emailOrderForm" method="POST" target="emailOrderFrame">
+      <input type="hidden" name="_captcha" value="false" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_subject" id="emailOrderSubject" value="" />
+      <input type="hidden" name="order_id" id="emailOrderId" value="" />
+      <input type="hidden" name="customer_name" id="emailOrderName" value="" />
+      <input type="hidden" name="customer_phone" id="emailOrderPhone" value="" />
+      <input type="hidden" name="customer_address" id="emailOrderAddress" value="" />
+      <input type="hidden" name="customer_notes" id="emailOrderNotes" value="" />
+      <input type="hidden" name="order_items" id="emailOrderItems" value="" />
+      <input type="hidden" name="order_total" id="emailOrderTotal" value="" />
+      <input type="hidden" name="order_message" id="emailOrderMessage" value="" />
+    </form>
+    <iframe
+      id="emailOrderFrame"
+      name="emailOrderFrame"
+      title="email-sender"
+      style="display: none"
+    ></iframe>
+  </div>
+`;
+
+let emailFormReady = Promise.resolve();
+const mountEmailForm = () => {
+  if (!emailFormMount) {
+    return;
+  }
+  emailFormReady = fetch("order-email-form.html", { cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("email form not found");
+      }
+      return response.text();
+    })
+    .then((htmlText) => {
+      emailFormMount.innerHTML = htmlText;
+    })
+    .catch(() => {
+      emailFormMount.innerHTML = buildEmailFormMarkup();
+    });
+};
+
+const setEmailField = (id, value) => {
+  const field = document.getElementById(id);
+  if (field) {
+    field.value = value || "";
+  }
+};
+
+const sendOrderEmail = (formData, order) => {
+  const email = getOrdersEmail(storeData);
+  if (!email) {
+    return;
+  }
+  emailFormReady.then(() => {
+    const form = document.getElementById("emailOrderForm");
+    if (!form) {
+      return;
+    }
+    form.action = `https://formsubmit.co/${email}`;
+    setEmailField("emailOrderSubject", buildOrderEmailSubject(order.id));
+    setEmailField("emailOrderId", order.id);
+    setEmailField("emailOrderName", formData.name);
+    setEmailField("emailOrderPhone", formData.phone);
+    setEmailField("emailOrderAddress", formData.address);
+    setEmailField("emailOrderNotes", formData.notes || "");
+    setEmailField("emailOrderItems", buildOrderEmailItems(order.items));
+    setEmailField("emailOrderTotal", formatCurrency(order.total || 0));
+    setEmailField("emailOrderMessage", buildOrderEmailMessage(formData, order));
+    form.submit();
+  });
+};
+
 const buildOrderMessage = (formData, orderId) => {
   const itemsLines = cart
     .map((item) => {
@@ -1139,7 +1283,7 @@ cartItems.addEventListener("click", (event) => {
   }
 });
 
-orderForm.addEventListener("submit", (event) => {
+orderForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (cart.length === 0) {
@@ -1157,19 +1301,14 @@ orderForm.addEventListener("submit", (event) => {
     return;
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
-  const orderId = generateOrderId();
-  const order = {
-    id: orderId,
-    date: new Date().toISOString(),
+  updateOrderStatus("orderSending", "hint");
+
+  const orderPayload = {
     name,
     phone,
     address,
     notes,
-    total,
-    status: "new",
-    shippingStatus: "pending",
-    deliveryFee: 0,
+    lang: currentLang,
     items: cart.map((item) => ({
       id: item.id,
       nameAr: item.nameAr,
@@ -1179,13 +1318,13 @@ orderForm.addEventListener("submit", (event) => {
     }))
   };
 
-  saveOrder(order);
+  const savedOrder = await window.DodyApi?.createOrder?.(orderPayload);
+  if (!savedOrder || !savedOrder.id) {
+    updateOrderStatus("orderFailed", "error");
+    return;
+  }
 
-  const message = buildOrderMessage({ name, phone, address, notes }, orderId);
-  const url = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
-
-  orderStatus.dataset.orderId = orderId;
+  orderStatus.dataset.orderId = savedOrder.id;
   updateOrderStatus("orderSuccess", "success");
 
   cart = [];
@@ -1312,14 +1451,21 @@ if (backToTopBtn) {
   });
 }
 
-storeWhatsApp = getWhatsAppNumber(storeData);
-orderStatus.dataset.key = "orderHint";
-orderStatus.dataset.type = "hint";
-applyTranslations();
+const initApp = async () => {
+  storeData = await loadStoreData();
+  storeWhatsApp = getWhatsAppNumber(storeData);
+  if (orderStatus) {
+    orderStatus.dataset.key = "orderHint";
+    orderStatus.dataset.type = "hint";
+  }
+  applyTranslations();
 
-const urlParams = new URLSearchParams(window.location.search);
-if (urlParams.get("cart") === "open") {
-  toggleCart(true);
-}
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("cart") === "open") {
+    toggleCart(true);
+  }
 
-initOrderDraft();
+  initOrderDraft();
+};
+
+initApp();

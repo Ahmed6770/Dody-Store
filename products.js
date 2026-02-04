@@ -24,7 +24,16 @@ const mergeDeep = (target, source) => {
   return target;
 };
 
-const loadStoreData = () => {
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
   const saved = localStorage.getItem("dodyStoreData");
   if (!saved) {
     return deepClone(defaultData);
@@ -129,7 +138,7 @@ const getWhatsAppNumber = (data) => {
   return digits || "201123456789";
 };
 
-let storeData = loadStoreData();
+let storeData = deepClone(defaultData);
 let currentLang = localStorage.getItem("lang") || "ar";
 let cart = loadCart();
 let activeFilter = "all";
@@ -554,4 +563,9 @@ if (backToTopBtn) {
   });
 }
 
-applyTranslations();
+const init = async () => {
+  storeData = await loadStoreData();
+  applyTranslations();
+};
+
+init();

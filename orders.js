@@ -146,32 +146,65 @@ const t = (key) => i18n[dashLang]?.[key] || key;
 const getLocale = () => (dashLang === "ar" ? "ar-EG" : "en-US");
 const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "جنيه" : "EGP"}`;
 
-const loadStoreData = () => {
+const defaultData = window.DODY_DEFAULT_DATA || {};
+const deepClone = (data) => JSON.parse(JSON.stringify(data));
+
+const mergeDeep = (target, source) => {
+  if (!source) {
+    return target;
+  }
+  Object.keys(source).forEach((key) => {
+    const value = source[key];
+    if (Array.isArray(value)) {
+      target[key] = value;
+    } else if (value && typeof value === "object") {
+      target[key] = mergeDeep(target[key] || {}, value);
+    } else {
+      target[key] = value;
+    }
+  });
+  return target;
+};
+
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
   const raw = localStorage.getItem("dodyStoreData");
   if (!raw) {
-    return null;
+    return deepClone(defaultData);
   }
   try {
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return mergeDeep(deepClone(defaultData), parsed);
   } catch (error) {
-    return null;
+    return deepClone(defaultData);
   }
 };
 
-const loadOrders = () => {
-  const raw = localStorage.getItem("dodyOrders");
-  if (!raw) {
-    return [];
-  }
-  try {
-    return JSON.parse(raw);
-  } catch (error) {
-    return [];
-  }
-};
+let storeData = deepClone(defaultData);
+let ordersCache = [];
 
-const saveOrders = (orders) => {
-  localStorage.setItem("dodyOrders", JSON.stringify(orders));
+const loadOrders = () => ordersCache;
+const setOrders = (orders) => {
+  ordersCache = Array.isArray(orders) ? orders : [];
+};
+const updateOrderCache = (order) => {
+  if (!order || !order.id) {
+    return;
+  }
+  const index = ordersCache.findIndex((item) => item.id === order.id);
+  if (index === -1) {
+    ordersCache.unshift(order);
+  } else {
+    ordersCache[index] = order;
+  }
 };
 
 const normalizeOrder = (order) => ({
@@ -197,9 +230,10 @@ const showGate = (show) => {
   adminGate.setAttribute("aria-hidden", (!show).toString());
 };
 
-const checkAuth = () => {
-  const authed = localStorage.getItem("dodyAdminAuth") === "true";
+const checkAuth = async () => {
+  const authed = await window.DodyApi?.checkAuth?.();
   showGate(!authed);
+  return authed;
 };
 
 const applyLang = () => {
@@ -229,8 +263,7 @@ const applyLang = () => {
   document.title = `${t("ordersPageTitle")} | Dody Store`;
   const favicon = document.getElementById("siteFavicon");
   if (favicon) {
-    const stored = loadStoreData();
-    favicon.href = stored?.brand?.favicon || stored?.brand?.logo || "assets/logo.svg";
+    favicon.href = storeData?.brand?.favicon || storeData?.brand?.logo || "assets/logo.svg";
   }
   renderSummary();
   renderOrders();
@@ -375,6 +408,17 @@ const renderOrders = () => {
   });
 };
 
+const refreshOrders = async () => {
+  const orders = await window.DodyApi?.fetchOrders?.();
+  if (Array.isArray(orders)) {
+    setOrders(orders);
+  } else {
+    setOrders([]);
+  }
+  renderSummary();
+  renderOrders();
+};
+
 const escapeHtml = (value) =>
   String(value ?? "").replace(/[&<>"']/g, (char) => {
     const map = {
@@ -478,16 +522,15 @@ const bindEvents = () => {
   }
 
   if (adminPinBtn) {
-    adminPinBtn.addEventListener("click", () => {
+    adminPinBtn.addEventListener("click", async () => {
       const pin = adminPinInput.value.trim();
-      const stored = loadStoreData();
-      const realPin = stored?.admin?.pin || "2026";
-      if (pin === realPin) {
-        localStorage.setItem("dodyAdminAuth", "true");
+      const ok = await window.DodyApi?.login?.(pin);
+      if (ok) {
         adminPinInput.value = "";
         adminPinHint.dataset.i18n = "adminHint";
         adminPinHint.textContent = "";
         showGate(false);
+        await refreshOrders();
       } else {
         adminPinHint.dataset.i18n = "adminPinError";
         adminPinHint.textContent = t("adminPinError");
@@ -500,9 +543,13 @@ const bindEvents = () => {
   }
 
   if (clearOrdersBtn) {
-    clearOrdersBtn.addEventListener("click", () => {
-      if (confirm(t("confirmClearOrders"))) {
-        localStorage.removeItem("dodyOrders");
+    clearOrdersBtn.addEventListener("click", async () => {
+      if (!confirm(t("confirmClearOrders"))) {
+        return;
+      }
+      const ok = await window.DodyApi?.clearOrders?.();
+      if (ok) {
+        setOrders([]);
         renderOrders();
         renderSummary();
       }
@@ -510,38 +557,37 @@ const bindEvents = () => {
   }
 
   if (ordersTable) {
-    ordersTable.addEventListener("change", (event) => {
+    ordersTable.addEventListener("change", async (event) => {
       const target = event.target;
       if (!target.matches("select[data-order-id]")) {
         return;
       }
-      const orders = loadOrders().map(normalizeOrder);
-      const order = orders.find((item) => item.id === target.dataset.orderId);
-      if (!order) {
-        return;
+      const orderId = target.dataset.orderId;
+      const patch =
+        target.dataset.field === "shipping"
+          ? { shippingStatus: target.value }
+          : { status: target.value };
+      const updated = await window.DodyApi?.updateOrder?.(orderId, patch);
+      if (updated) {
+        updateOrderCache(updated);
+        renderOrders();
+        renderSummary();
       }
-      if (target.dataset.field === "shipping") {
-        order.shippingStatus = target.value;
-      } else {
-        order.status = target.value;
-      }
-      saveOrders(orders);
-      renderOrders();
-      renderSummary();
     });
 
-    ordersTable.addEventListener("click", (event) => {
+    ordersTable.addEventListener("click", async (event) => {
       const removeBtn = event.target.closest("[data-action='remove-order']");
       if (removeBtn) {
         if (!confirm(t("confirmRemoveOrder"))) {
           return;
         }
         const orderId = removeBtn.dataset.orderId;
-        const orders = loadOrders().map(normalizeOrder);
-        const updated = orders.filter((order) => order.id !== orderId);
-        saveOrders(updated);
-        renderOrders();
-        renderSummary();
+        const ok = await window.DodyApi?.deleteOrder?.(orderId);
+        if (ok) {
+          setOrders(loadOrders().filter((order) => order.id !== orderId));
+          renderOrders();
+          renderSummary();
+        }
         return;
       }
       const row = event.target.closest(".table-row[data-details]");
@@ -588,11 +634,14 @@ const bindEvents = () => {
   });
 };
 
-const init = () => {
-  checkAuth();
-  const stored = loadStoreData();
-  if (brandLogo && stored?.brand?.logo) {
-    brandLogo.src = stored.brand.logo;
+const init = async () => {
+  const authed = await checkAuth();
+  storeData = await loadStoreData();
+  if (brandLogo && storeData?.brand?.logo) {
+    brandLogo.src = storeData.brand.logo;
+  }
+  if (authed) {
+    await refreshOrders();
   }
   applyLang();
   bindEvents();

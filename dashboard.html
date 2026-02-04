@@ -17,6 +17,7 @@
           id="adminPinInput"
           type="password"
           placeholder="••••"
+          
           data-i18n-placeholder="adminPinPlaceholder"
         />
         <button class="primary" id="adminPinBtn" data-i18n="adminLogin">دخول</button>
@@ -102,6 +103,10 @@
           <label class="field">
             <span data-i18n="whatsappIntl">واتساب دولي (بدون +)</span>
             <input id="whatsappIntlInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="ordersEmailLabel">إيميل استقبال الطلبات</span>
+            <input id="ordersEmailInput" type="email" />
           </label>
           <label class="field">
             <span data-i18n="instagramLabel">إنستجرام</span>
@@ -504,6 +509,7 @@
     <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
 
     <script src="data.js"></script>
+    <script src="api-client.js"></script>
     <script src="dashboard.js"></script>
   </body>
 </html>

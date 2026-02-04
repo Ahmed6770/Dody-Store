@@ -24,7 +24,16 @@ const mergeDeep = (target, source) => {
   return target;
 };
 
-const loadStoreData = () => {
+const loadStoreData = async () => {
+  const apiData = await window.DodyApi?.fetchStoreData?.();
+  if (apiData && typeof apiData === "object") {
+    try {
+      localStorage.setItem("dodyStoreData", JSON.stringify(apiData));
+    } catch (error) {
+      // ignore storage errors
+    }
+    return mergeDeep(deepClone(defaultData), apiData);
+  }
   const saved = localStorage.getItem("dodyStoreData");
   if (!saved) {
     return deepClone(defaultData);
@@ -87,7 +96,7 @@ const persistCart = (cart) => {
   localStorage.setItem("dodyCart", JSON.stringify(cart));
 };
 
-let storeData = loadStoreData();
+let storeData = deepClone(defaultData);
 let currentLang = localStorage.getItem("lang") || "ar";
 let cart = loadCart();
 
@@ -297,6 +306,11 @@ if (backToTopBtn) {
   });
 }
 
-applyTranslations();
-renderBundle();
-updateCartCount();
+const init = async () => {
+  storeData = await loadStoreData();
+  applyTranslations();
+  renderBundle();
+  updateCartCount();
+};
+
+init();

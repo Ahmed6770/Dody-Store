@@ -1,0 +1,21 @@
+<div class="email-order-helper" id="emailOrderHelper" aria-hidden="true" hidden>
+  <form id="emailOrderForm" method="POST" target="emailOrderFrame">
+    <input type="hidden" name="_captcha" value="false" />
+    <input type="hidden" name="_template" value="table" />
+    <input type="hidden" name="_subject" id="emailOrderSubject" value="" />
+    <input type="hidden" name="order_id" id="emailOrderId" value="" />
+    <input type="hidden" name="customer_name" id="emailOrderName" value="" />
+    <input type="hidden" name="customer_phone" id="emailOrderPhone" value="" />
+    <input type="hidden" name="customer_address" id="emailOrderAddress" value="" />
+    <input type="hidden" name="customer_notes" id="emailOrderNotes" value="" />
+    <input type="hidden" name="order_items" id="emailOrderItems" value="" />
+    <input type="hidden" name="order_total" id="emailOrderTotal" value="" />
+    <input type="hidden" name="order_message" id="emailOrderMessage" value="" />
+  </form>
+  <iframe
+    id="emailOrderFrame"
+    name="emailOrderFrame"
+    title="email-sender"
+    style="display: none"
+  ></iframe>
+</div>
