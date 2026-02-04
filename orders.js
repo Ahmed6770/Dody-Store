@@ -1,11 +1,14 @@
-const adminGate = document.getElementById("adminGate");
-const adminPinInput = document.getElementById("adminPinInput");
-const adminPinBtn = document.getElementById("adminPinBtn");
-const adminPinHint = document.getElementById("adminPinHint");
+﻿const adminGate = document.getElementById("adminGate");
+const adminEmailInput = document.getElementById("adminEmailInput");
+const adminPasswordInput = document.getElementById("adminPasswordInput");
+const adminLoginBtn = document.getElementById("adminLoginBtn");
+const adminLoginHint = document.getElementById("adminLoginHint");
 const ordersLangToggle = document.getElementById("ordersLangToggle");
 const summaryCards = document.getElementById("summaryCards");
 const ordersSummary = document.getElementById("ordersSummary");
 const ordersTable = document.getElementById("ordersTable");
+const ordersStatusFilter = document.getElementById("ordersStatusFilter");
+const ordersSearchInput = document.getElementById("ordersSearchInput");
 const exportOrdersBtn = document.getElementById("exportOrders");
 const clearOrdersBtn = document.getElementById("clearOrders");
 const brandLogo = document.getElementById("brandLogo");
@@ -17,74 +20,85 @@ let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 
 const i18n = {
   ar: {
-    adminTitle: "دخول لوحة التحكم",
-    adminDesc: "أدخل الرمز السري للوصول إلى لوحة الإدارة.",
-    adminLogin: "دخول",
-    adminHint: "اسأل المسؤول عن الرمز.",
-    adminPinError: "الرمز غير صحيح.",
-    adminPinPlaceholder: "••••",
-    dashTitle: "لوحة تحكم Dody Store",
-    dashSubtitle: "إدارة المحتوى والطلبات بسهولة",
-    navOverview: "نظرة عامة",
-    navGeneral: "الإعدادات العامة",
-    navHero: "الهيرو والباقات",
-    navSections: "عناوين الأقسام",
-    navCategories: "أنواع المنتجات",
-    navCollections: "الباقات الجاهزة",
-    navProducts: "المنتجات",
-    navIngredients: "المكونات",
-    navTestimonials: "آراء العملاء",
-    navAbout: "عن المتجر",
-    navContactCta: "تواصل واتساب",
-    navOrders: "الطلبات",
-    navToggle: "القائمة",
-    ordersPageTitle: "إدارة الطلبات",
-    ordersPageSubtitle: "تابعي الحالات، الشحن، والتفاصيل بسرعة.",
-    exportExcel: "تصدير Excel",
-    backToDashboard: "رجوع للوحة",
-    backToSite: "رجوع للموقع",
-    ordersTitle: "الطلبات",
-    clearOrders: "مسح كل الطلبات",
-    summaryOrders: "إجمالي الطلبات",
-    summaryNew: "طلبات جديدة",
-    summaryProcessing: "قيد التنفيذ",
-    summaryRevenue: "إجمالي المبيعات",
-    summaryCancelled: "ملغاة",
-    ordersSummary: "عدد الطلبات",
-    ordersSummaryNew: "جديدة",
-    ordersSummaryCancelled: "ملغاة",
-    ordersHeaderCustomer: "العميل",
-    ordersHeaderId: "رقم الطلب",
-    ordersHeaderDate: "التاريخ",
-    ordersHeaderTotals: "المدفوعات",
-    ordersHeaderStatus: "الحالة",
-    ordersHeaderActions: "الإجراءات",
-    ordersHeaderShipping: "الشحن",
-    ordersHeaderItems: "المنتجات",
-    ordersTotalLabel: "الإجمالي",
-    ordersDeliveryLabel: "التوصيل",
-    ordersNetLabel: "الصافي",
-    statusNew: "جديد",
-    statusProcessing: "قيد التنفيذ",
-    statusDone: "تم التسليم",
-    statusCancelled: "ملغي",
-    shippingPending: "لم يتم الشحن",
-    shippingShipped: "تم الشحن",
-    viewDetails: "تفاصيل",
-    whatsappAction: "واتساب",
-    removeOrder: "حذف",
-    confirmRemoveOrder: "هل تريد حذف الطلب؟",
-    noOrders: "لا يوجد طلبات حتى الآن.",
-    confirmClearOrders: "هل تريد مسح كل الطلبات؟",
-    exportEmpty: "لا يوجد بيانات لتصديرها."
+    adminTitle: "Ø¯Ø®ÙˆÙ„ Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…",
+    adminDesc: "سجّل الدخول بحساب الإدارة",
+    adminLogin: "Ø¯Ø®ÙˆÙ„",
+    adminHint: "تأكد من البريد وكلمة المرور",
+    adminPinError: "Ø§Ù„Ø±Ù…Ø² ØºÙŠØ± ØµØ­ÙŠØ­.",
+    adminPinPlaceholder: "â€¢â€¢â€¢â€¢",
+    adminLoginError: "بيانات الدخول غير صحيحة.",
+    adminEmailPlaceholder: "البريد الإلكتروني",
+    adminPasswordPlaceholder: "كلمة المرور",
+    dashTitle: "Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… Dody Store",
+    dashSubtitle: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ§Ù„Ø·Ù„Ø¨Ø§Øª Ø¨Ø³Ù‡ÙˆÙ„Ø©",
+    navOverview: "Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©",
+    navGeneral: "Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø©",
+    navHero: "Ø§Ù„Ù‡ÙŠØ±Ùˆ ÙˆØ§Ù„Ø¨Ø§Ù‚Ø§Øª",
+    navSections: "Ø¹Ù†Ø§ÙˆÙŠÙ† Ø§Ù„Ø£Ù‚Ø³Ø§Ù…",
+    navCategories: "Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
+    navCollections: "Ø§Ù„Ø¨Ø§Ù‚Ø§Øª Ø§Ù„Ø¬Ø§Ù‡Ø²Ø©",
+    navProducts: "Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
+    navIngredients: "Ø§Ù„Ù…ÙƒÙˆÙ†Ø§Øª",
+    navTestimonials: "Ø¢Ø±Ø§Ø¡ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡",
+    navAbout: "Ø¹Ù† Ø§Ù„Ù…ØªØ¬Ø±",
+    navContactCta: "ØªÙˆØ§ØµÙ„ ÙˆØ§ØªØ³Ø§Ø¨",
+    navOrders: "Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    navToggle: "Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©",
+    ordersPageTitle: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    ordersPageSubtitle: "ØªØ§Ø¨Ø¹ÙŠ Ø§Ù„Ø­Ø§Ù„Ø§ØªØŒ Ø§Ù„Ø´Ø­Ù†ØŒ ÙˆØ§Ù„ØªÙØ§ØµÙŠÙ„ Ø¨Ø³Ø±Ø¹Ø©.",
+    exportExcel: "ØªØµØ¯ÙŠØ± Excel",
+    backToDashboard: "Ø±Ø¬ÙˆØ¹ Ù„Ù„ÙˆØ­Ø©",
+    backToSite: "Ø±Ø¬ÙˆØ¹ Ù„Ù„Ù…ÙˆÙ‚Ø¹",
+    ordersTitle: "Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    clearOrders: "Ù…Ø³Ø­ ÙƒÙ„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    summaryOrders: "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    summaryNew: "Ø·Ù„Ø¨Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©",
+    summaryProcessing: "Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°",
+    summaryRevenue: "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª",
+    summaryCancelled: "Ù…Ù„ØºØ§Ø©",
+    ordersSummary: "Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    ordersSummaryNew: "Ø¬Ø¯ÙŠØ¯Ø©",
+    ordersSummaryCancelled: "Ù…Ù„ØºØ§Ø©",
+    ordersSummaryFiltered: "Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶",
+    ordersFilterLabel: "ÙÙ„ØªØ±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
+    ordersSearchLabel: "Ø¨Ø­Ø«",
+    ordersSearchPlaceholder: "Ø§Ø³Ù… / Ø±Ù‚Ù… / Ù‡Ø§ØªÙ",
+    filterAll: "Ø§Ù„ÙƒÙ„",
+    ordersHeaderCustomer: "Ø§Ù„Ø¹Ù…ÙŠÙ„",
+    ordersHeaderId: "Ø±Ù‚Ù… Ø§Ù„Ø·Ù„Ø¨",
+    ordersHeaderDate: "Ø§Ù„ØªØ§Ø±ÙŠØ®",
+    ordersHeaderTotals: "Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª",
+    ordersHeaderStatus: "Ø§Ù„Ø­Ø§Ù„Ø©",
+    ordersHeaderActions: "Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª",
+    ordersHeaderShipping: "Ø§Ù„Ø´Ø­Ù†",
+    ordersHeaderItems: "Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
+    ordersTotalLabel: "Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ",
+    ordersDeliveryLabel: "Ø§Ù„ØªÙˆØµÙŠÙ„",
+    ordersNetLabel: "Ø§Ù„ØµØ§ÙÙŠ",
+    statusNew: "Ø¬Ø¯ÙŠØ¯",
+    statusProcessing: "Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°",
+    statusDone: "ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…",
+    statusCancelled: "Ù…Ù„ØºÙŠ",
+    shippingPending: "Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø´Ø­Ù†",
+    shippingShipped: "ØªÙ… Ø§Ù„Ø´Ø­Ù†",
+    viewDetails: "ØªÙØ§ØµÙŠÙ„",
+    whatsappAction: "ÙˆØ§ØªØ³Ø§Ø¨",
+    removeOrder: "Ø­Ø°Ù",
+    confirmRemoveOrder: "Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ø§Ù„Ø·Ù„Ø¨ØŸ",
+    noOrders: "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†.",
+    confirmClearOrders: "Ù‡Ù„ ØªØ±ÙŠØ¯ Ù…Ø³Ø­ ÙƒÙ„ Ø§Ù„Ø·Ù„Ø¨Ø§ØªØŸ",
+    exportEmpty: "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù„ØªØµØ¯ÙŠØ±Ù‡Ø§."
   },
   en: {
     adminTitle: "Admin Access",
-    adminDesc: "Enter the PIN to access the dashboard.",
+    adminDesc: "Sign in with your admin account.",
     adminLogin: "Login",
-    adminHint: "Ask the owner for the PIN.",
+    adminHint: "Check your email and password.",
     adminPinError: "Incorrect PIN.",
-    adminPinPlaceholder: "••••",
+    adminPinPlaceholder: "â€¢â€¢â€¢â€¢",
+    adminLoginError: "Incorrect login details.",
+    adminEmailPlaceholder: "Email address",
+    adminPasswordPlaceholder: "Password",
     dashTitle: "Dody Store Dashboard",
     dashSubtitle: "Manage content and orders with ease",
     navOverview: "Overview",
@@ -115,6 +129,11 @@ const i18n = {
     ordersSummary: "Orders",
     ordersSummaryNew: "New",
     ordersSummaryCancelled: "Cancelled",
+    ordersSummaryFiltered: "Shown",
+    ordersFilterLabel: "Filter orders",
+    ordersSearchLabel: "Search",
+    ordersSearchPlaceholder: "Name / ID / phone",
+    filterAll: "All",
     ordersHeaderCustomer: "Customer",
     ordersHeaderId: "Order ID",
     ordersHeaderDate: "Date",
@@ -144,7 +163,7 @@ const i18n = {
 
 const t = (key) => i18n[dashLang]?.[key] || key;
 const getLocale = () => (dashLang === "ar" ? "ar-EG" : "en-US");
-const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "جنيه" : "EGP"}`;
+const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "Ø¬Ù†ÙŠÙ‡" : "EGP"}`;
 
 const defaultData = window.DODY_DEFAULT_DATA || {};
 const deepClone = (data) => JSON.parse(JSON.stringify(data));
@@ -191,6 +210,8 @@ const loadStoreData = async () => {
 let storeData = deepClone(defaultData);
 let ordersCache = [];
 let ordersPoll = null;
+let orderStatusFilter = "all";
+let orderSearchTerm = "";
 
 const loadOrders = () => ordersCache;
 const setOrders = (orders) => {
@@ -214,6 +235,28 @@ const normalizeOrder = (order) => ({
   shippingStatus: order.shippingStatus || "pending",
   deliveryFee: Number(order.deliveryFee) || 0
 });
+
+const applyOrderFilters = (orders) => {
+  let filtered = orders;
+  if (orderStatusFilter && orderStatusFilter !== "all") {
+    filtered = filtered.filter((order) => order.status === orderStatusFilter);
+  }
+  if (orderSearchTerm) {
+    const term = orderSearchTerm.toLowerCase();
+    filtered = filtered.filter((order) => {
+      const haystack = [
+        order.id,
+        order.name,
+        order.phone,
+        order.address
+      ]
+        .map((value) => String(value || "").toLowerCase())
+        .join(" ");
+      return haystack.includes(term);
+    });
+  }
+  return filtered;
+};
 
 const formatPhone = (value) => {
   const digits = String(value || "").replace(/\D/g, "");
@@ -258,7 +301,7 @@ const applyLang = () => {
   });
 
   if (ordersLangToggle) {
-    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "عربي";
+    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "Ø¹Ø±Ø¨ÙŠ";
   }
 
   document.title = `${t("ordersPageTitle")} | Dody Store`;
@@ -314,7 +357,7 @@ const buildOrdersRow = (order) => {
 
   const waMessage =
     dashLang === "ar"
-      ? `مرحباً ${order.name}، بنأكد طلبك رقم ${order.id}.`
+      ? `Ù…Ø±Ø­Ø¨Ø§Ù‹ ${order.name}ØŒ Ø¨Ù†Ø£ÙƒØ¯ Ø·Ù„Ø¨Ùƒ Ø±Ù‚Ù… ${order.id}.`
       : `Hi ${order.name}, we're confirming your order #${order.id}.`;
   const waLink = `https://wa.me/${formatPhone(order.phone)}?text=${encodeURIComponent(
     waMessage
@@ -377,15 +420,19 @@ const renderOrders = () => {
   }
   const rawOrders = loadOrders();
   const orders = rawOrders.map(normalizeOrder);
+  const filteredOrders = applyOrderFilters(orders);
   const newCount = orders.filter((order) => order.status === "new").length;
   const cancelledCount = orders.filter((order) => order.status === "cancelled").length;
 
   ordersSummary.textContent = `${t("ordersSummary")}: ${orders.length} | ${t(
     "ordersSummaryNew"
   )}: ${newCount} | ${t("ordersSummaryCancelled")}: ${cancelledCount}`;
+  if (orders.length !== filteredOrders.length) {
+    ordersSummary.textContent += ` | ${t("ordersSummaryFiltered")}: ${filteredOrders.length}`;
+  }
 
   ordersTable.innerHTML = "";
-  if (orders.length === 0) {
+  if (filteredOrders.length === 0) {
     ordersTable.innerHTML = `<div class="table-row">${t("noOrders")}</div>`;
     return;
   }
@@ -404,7 +451,7 @@ const renderOrders = () => {
     `
   );
 
-  orders.forEach((order) => {
+  filteredOrders.forEach((order) => {
     ordersTable.insertAdjacentHTML("beforeend", buildOrdersRow(order));
   });
 };
@@ -531,20 +578,36 @@ const bindEvents = () => {
     });
   }
 
-  if (adminPinBtn) {
-    adminPinBtn.addEventListener("click", async () => {
-      const pin = adminPinInput.value.trim();
-      const ok = await window.DodyApi?.login?.(pin);
+  if (ordersStatusFilter) {
+    ordersStatusFilter.addEventListener("change", () => {
+      orderStatusFilter = ordersStatusFilter.value || "all";
+      renderOrders();
+    });
+  }
+
+  if (ordersSearchInput) {
+    ordersSearchInput.addEventListener("input", () => {
+      orderSearchTerm = ordersSearchInput.value.trim();
+      renderOrders();
+    });
+  }
+
+  if (adminLoginBtn) {
+    adminLoginBtn.addEventListener("click", async () => {
+      const email = adminEmailInput?.value.trim() || "";
+      const password = adminPasswordInput?.value.trim() || "";
+      const ok = await window.DodyApi?.login?.(email, password);
       if (ok) {
-        adminPinInput.value = "";
-        adminPinHint.dataset.i18n = "adminHint";
-        adminPinHint.textContent = "";
+        if (adminEmailInput) adminEmailInput.value = "";
+        if (adminPasswordInput) adminPasswordInput.value = "";
+        adminLoginHint.dataset.i18n = "adminHint";
+        adminLoginHint.textContent = "";
         showGate(false);
         await refreshOrders();
         startOrdersPolling();
       } else {
-        adminPinHint.dataset.i18n = "adminPinError";
-        adminPinHint.textContent = t("adminPinError");
+        adminLoginHint.dataset.i18n = "adminLoginError";
+        adminLoginHint.textContent = t("adminLoginError");
       }
     });
   }

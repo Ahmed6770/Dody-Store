@@ -12,16 +12,21 @@
     <div class="admin-gate" id="adminGate" aria-hidden="true">
       <div class="admin-card">
         <h2 data-i18n="adminTitle">دخول لوحة التحكم</h2>
-        <p data-i18n="adminDesc">أدخل الرمز السري للوصول إلى لوحة الإدارة.</p>
+        <p data-i18n="adminDesc">سجّل الدخول بحساب الإدارة.</p>
         <input
-          id="adminPinInput"
-          type="password"
-          placeholder="••••"
-          
-          data-i18n-placeholder="adminPinPlaceholder"
+          id="adminEmailInput"
+          type="email"
+          placeholder="email@example.com"
+          data-i18n-placeholder="adminEmailPlaceholder"
         />
-        <button class="primary" id="adminPinBtn" data-i18n="adminLogin">دخول</button>
-        <p class="admin-hint" id="adminPinHint" data-i18n="adminHint"></p>
+        <input
+          id="adminPasswordInput"
+          type="password"
+          placeholder="••••••"
+          data-i18n-placeholder="adminPasswordPlaceholder"
+        />
+        <button class="primary" id="adminLoginBtn" data-i18n="adminLogin">دخول</button>
+        <p class="admin-hint" id="adminLoginHint" data-i18n="adminHint"></p>
       </div>
     </div>
 
@@ -109,6 +114,21 @@
             <input id="ordersEmailInput" type="email" />
           </label>
           <label class="field">
+            <span data-i18n="telegramChatIdLabel">تيليجرام Chat ID</span>
+            <input id="telegramChatIdInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="telegramTokenLabel">تيليجرام Bot Token</span>
+            <input id="telegramTokenInput" type="password" placeholder="••••••" />
+          </label>
+          <label class="field">
+            <span data-i18n="telegramEnabledLabel">تفعيل إشعارات تيليجرام</span>
+            <input id="telegramEnabledToggle" type="checkbox" />
+          </label>
+          <p class="muted" id="telegramTokenHint" data-i18n="telegramTokenHint">
+            اترك التوكن فارغًا إذا كنت لا تريد تغييره.
+          </p>
+          <label class="field">
             <span data-i18n="instagramLabel">إنستجرام</span>
             <input id="instagramInput" type="text" />
           </label>
@@ -143,10 +163,6 @@
           <label class="field">
             <span data-i18n="footerDescEn">وصف الفوتر (إنجليزي)</span>
             <input id="footerDescEnInput" type="text" />
-          </label>
-          <label class="field">
-            <span data-i18n="adminPinLabel">رمز دخول اللوحة</span>
-            <input id="adminPinSetting" type="text" />
           </label>
         </div>
         <div class="media-field">

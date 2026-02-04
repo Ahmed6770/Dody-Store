@@ -43,21 +43,31 @@ const loadStoreData = async () => {
   }
 };
 
+const loadTelegramSettings = async () => {
+  const settings = await window.DodyApi?.getTelegramSettings?.();
+  if (!settings || typeof settings !== "object") {
+    return null;
+  }
+  return settings;
+};
+
 let storeData = deepClone(defaultData);
 let ordersPoll = null;
 let draggingProductRow = null;
 let productStatusFilter = "all";
 let productSearchTerm = "";
+let telegramSettings = null;
 
 let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 const dashI18n = {
   ar: {
     adminTitle: "دخول لوحة التحكم",
-    adminDesc: "أدخل الرمز السري للوصول إلى لوحة الإدارة.",
+    adminDesc: "سجّل الدخول بحساب الإدارة.",
     adminLogin: "دخول",
-    adminHint: "اسأل المسؤول عن الرمز.",
-    adminPinError: "الرمز غير صحيح.",
-    adminPinPlaceholder: "••••",
+    adminHint: "تأكد من البريد وكلمة المرور.",
+    adminLoginError: "بيانات الدخول غير صحيحة.",
+    adminEmailPlaceholder: "البريد الإلكتروني",
+    adminPasswordPlaceholder: "كلمة المرور",
     dashTitle: "لوحة تحكم Dody Store",
     dashSubtitle: "إدارة المحتوى والطلبات بسهولة",
     navToggle: "القائمة",
@@ -100,6 +110,11 @@ const dashI18n = {
     whatsappDisplay: "واتساب (عرض)",
     whatsappIntl: "واتساب دولي (بدون +)",
     ordersEmailLabel: "إيميل استقبال الطلبات",
+    telegramChatIdLabel: "تيليجرام Chat ID",
+    telegramTokenLabel: "تيليجرام Bot Token",
+    telegramEnabledLabel: "تفعيل إشعارات تيليجرام",
+    telegramTokenHint: "اترك التوكن فارغًا إذا كنت لا تريد تغييره.",
+    telegramSupabaseHint: "في وضع Supabase يتم ضبط التوكن والـ Chat ID من إعدادات Edge Function.",
     instagramLabel: "إنستجرام",
     facebookLabel: "فيسبوك",
     hoursAr: "ساعات العمل (عربي)",
@@ -274,11 +289,12 @@ const dashI18n = {
   },
   en: {
     adminTitle: "Admin Access",
-    adminDesc: "Enter the PIN to access the dashboard.",
+    adminDesc: "Sign in with your admin account.",
     adminLogin: "Login",
-    adminHint: "Ask the owner for the PIN.",
-    adminPinError: "Incorrect PIN.",
-    adminPinPlaceholder: "••••",
+    adminHint: "Check your email and password.",
+    adminLoginError: "Incorrect login details.",
+    adminEmailPlaceholder: "Email address",
+    adminPasswordPlaceholder: "Password",
     dashTitle: "Dody Store Dashboard",
     dashSubtitle: "Manage content and orders with ease",
     navToggle: "Menu",
@@ -321,6 +337,11 @@ const dashI18n = {
     whatsappDisplay: "WhatsApp (display)",
     whatsappIntl: "WhatsApp international (no +)",
     ordersEmailLabel: "Orders inbox email",
+    telegramChatIdLabel: "Telegram Chat ID",
+    telegramTokenLabel: "Telegram Bot Token",
+    telegramEnabledLabel: "Enable Telegram alerts",
+    telegramTokenHint: "Leave empty if you don't want to change the token.",
+    telegramSupabaseHint: "In Supabase mode, set the token and chat ID in Edge Function secrets.",
     instagramLabel: "Instagram",
     facebookLabel: "Facebook",
     hoursAr: "Working hours (AR)",
@@ -508,9 +529,10 @@ const setValue = (id, value) => {
 };
 
 const adminGate = document.getElementById("adminGate");
-const adminPinInput = document.getElementById("adminPinInput");
-const adminPinBtn = document.getElementById("adminPinBtn");
-const adminPinHint = document.getElementById("adminPinHint");
+const adminEmailInput = document.getElementById("adminEmailInput");
+const adminPasswordInput = document.getElementById("adminPasswordInput");
+const adminLoginBtn = document.getElementById("adminLoginBtn");
+const adminLoginHint = document.getElementById("adminLoginHint");
 const logoutBtn = document.getElementById("logoutBtn");
 const dashLangToggle = document.getElementById("dashLangToggle");
 const sidebarToggle = document.getElementById("sidebarToggle");
@@ -555,6 +577,8 @@ const contactCtaNoteArInput = document.getElementById("contactCtaNoteArInput");
 const contactCtaNoteEnInput = document.getElementById("contactCtaNoteEnInput");
 const contactCtaMessageArInput = document.getElementById("contactCtaMessageArInput");
 const contactCtaMessageEnInput = document.getElementById("contactCtaMessageEnInput");
+const telegramEnabledToggle = document.getElementById("telegramEnabledToggle");
+const telegramTokenHint = document.getElementById("telegramTokenHint");
 const backToTopBtn = document.getElementById("backToTop");
 
 const readFileAsDataUrl = (file) =>
@@ -564,6 +588,73 @@ const readFileAsDataUrl = (file) =>
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+
+const loadImageElement = (file) =>
+  new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = (err) => {
+      URL.revokeObjectURL(url);
+      reject(err);
+    };
+    img.src = url;
+  });
+
+const resizeImageFile = async (file, options) => {
+  const {
+    maxWidth = 1200,
+    maxHeight = 1200,
+    mimeType = "image/jpeg",
+    quality = 0.82,
+    background = "#fff",
+  } = options || {};
+
+  if (!file.type.startsWith("image/")) {
+    return readFileAsDataUrl(file);
+  }
+
+  let source;
+  if (typeof createImageBitmap === "function") {
+    source = await createImageBitmap(file);
+  } else {
+    source = await loadImageElement(file);
+  }
+
+  const width = source.width || source.naturalWidth || 0;
+  const height = source.height || source.naturalHeight || 0;
+  if (!width || !height) {
+    return readFileAsDataUrl(file);
+  }
+
+  const ratio = Math.min(maxWidth / width, maxHeight / height, 1);
+  const targetWidth = Math.max(1, Math.round(width * ratio));
+  const targetHeight = Math.max(1, Math.round(height * ratio));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) {
+    return readFileAsDataUrl(file);
+  }
+
+  if (mimeType === "image/jpeg") {
+    ctx.fillStyle = background;
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+  }
+
+  ctx.drawImage(source, 0, 0, targetWidth, targetHeight);
+
+  if (source.close) {
+    source.close();
+  }
+
+  return canvas.toDataURL(mimeType, quality);
+};
 
 const showGate = (show) => {
   if (!adminGate) {
@@ -624,6 +715,7 @@ const applyDashLang = () => {
   refreshStatusOptions();
   refreshAvailabilityOptions();
   refreshProductOptions();
+  applyProductFilters();
 };
 
 const showDashSection = (sectionId) => {
@@ -1456,7 +1548,6 @@ const fillInputs = () => {
   setValue("homeSamplesInput", storeData.home?.samplesCount ?? 6);
   setValue("footerDescArInput", storeData.footer?.desc?.ar || "");
   setValue("footerDescEnInput", storeData.footer?.desc?.en || "");
-  setValue("adminPinSetting", "");
   setValue("contactCtaTitleArInput", storeData.contactCta?.title?.ar || "");
   setValue("contactCtaTitleEnInput", storeData.contactCta?.title?.en || "");
   setValue("contactCtaDescArInput", storeData.contactCta?.desc?.ar || "");
@@ -1538,6 +1629,37 @@ const fillInputs = () => {
   setValue("aboutCardMessageEnInput", storeData.about?.card?.message?.en || "");
 };
 
+const fillTelegramInputs = () => {
+  if (!telegramSettings) {
+    return;
+  }
+  setValue("telegramChatIdInput", telegramSettings.chatId || "");
+  setValue("telegramTokenInput", "");
+  if (telegramEnabledToggle) {
+    telegramEnabledToggle.checked = telegramSettings.enabled !== false;
+  }
+  if (telegramTokenHint) {
+    telegramTokenHint.textContent = t("telegramTokenHint");
+  }
+};
+
+const applyTelegramMode = () => {
+  const isSupabase = window.DODY_BACKEND === "supabase";
+  const fields = [
+    document.getElementById("telegramChatIdInput"),
+    document.getElementById("telegramTokenInput"),
+    telegramEnabledToggle,
+  ].filter(Boolean);
+  if (isSupabase) {
+    fields.forEach((field) => {
+      field.disabled = true;
+    });
+    if (telegramTokenHint) {
+      telegramTokenHint.textContent = t("telegramSupabaseHint");
+    }
+  }
+};
+
 const saveAll = async () => {
   const updated = mergeDeep(deepClone(defaultData), storeData);
 
@@ -1580,19 +1702,16 @@ const saveAll = async () => {
     updated.brand.favicon = storeData.brand.favicon;
   }
 
-  const newPin = getValue("adminPinSetting");
-  if (newPin) {
-    const pinOk = await window.DodyApi?.updatePin?.(newPin);
-    if (!pinOk) {
-      setSaveNote("saveError", "#b24b47");
-      return;
-    }
-    setValue("adminPinSetting", "");
-  }
-
   updated.footer.contact.whatsappDisplay = getValue("whatsappDisplayInput");
   updated.footer.contact.whatsappIntl = getValue("whatsappIntlInput");
   updated.orders.email = getValue("ordersEmailInput");
+  if (window.DodyApi?.saveTelegramSettings) {
+    await window.DodyApi.saveTelegramSettings({
+      chatId: getValue("telegramChatIdInput"),
+      token: getValue("telegramTokenInput"),
+      enabled: telegramEnabledToggle ? telegramEnabledToggle.checked : true,
+    });
+  }
   updated.footer.contact.instagram = getValue("instagramInput");
   updated.footer.contact.facebook = getValue("facebookInput");
   updated.footer.hours.ar = getValue("hoursArInput");
@@ -1986,20 +2105,22 @@ const bindEvents = () => {
     });
   }
 
-  if (adminPinBtn) {
-    adminPinBtn.addEventListener("click", async () => {
-      const pin = adminPinInput.value.trim();
-      const ok = await window.DodyApi?.login?.(pin);
+  if (adminLoginBtn) {
+    adminLoginBtn.addEventListener("click", async () => {
+      const email = adminEmailInput?.value.trim() || "";
+      const password = adminPasswordInput?.value.trim() || "";
+      const ok = await window.DodyApi?.login?.(email, password);
       if (ok) {
-        adminPinInput.value = "";
-        adminPinHint.dataset.i18n = "adminHint";
-        adminPinHint.textContent = "";
+        if (adminEmailInput) adminEmailInput.value = "";
+        if (adminPasswordInput) adminPasswordInput.value = "";
+        adminLoginHint.dataset.i18n = "adminHint";
+        adminLoginHint.textContent = "";
         showGate(false);
         await refreshOrders();
         startOrdersPolling();
       } else {
-        adminPinHint.dataset.i18n = "adminPinError";
-        adminPinHint.textContent = t("adminPinError");
+        adminLoginHint.dataset.i18n = "adminLoginError";
+        adminLoginHint.textContent = t("adminLoginError");
       }
     });
   }
@@ -2017,7 +2138,11 @@ const bindEvents = () => {
       if (!file) {
         return;
       }
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await resizeImageFile(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        mimeType: "image/png",
+      });
       brandLogoPreview.src = dataUrl;
       brandLogoPreview.dataset.imageData = dataUrl;
     });
@@ -2029,7 +2154,11 @@ const bindEvents = () => {
       if (!file) {
         return;
       }
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await resizeImageFile(file, {
+        maxWidth: 128,
+        maxHeight: 128,
+        mimeType: "image/png",
+      });
       brandFaviconPreview.src = dataUrl;
       brandFaviconPreview.dataset.imageData = dataUrl;
     });
@@ -2041,7 +2170,12 @@ const bindEvents = () => {
       if (!file) {
         return;
       }
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await resizeImageFile(file, {
+        maxWidth: 1200,
+        maxHeight: 1200,
+        mimeType: "image/jpeg",
+        quality: 0.85,
+      });
       featuredImagePreview.src = dataUrl;
       featuredImagePreview.dataset.imageData = dataUrl;
     });
@@ -2270,7 +2404,12 @@ const bindEvents = () => {
       const row = target.closest(".list-row");
       const preview = row.querySelector(".image-preview");
       const pathInput = row.querySelector("[data-field='image']");
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await resizeImageFile(file, {
+        maxWidth: 900,
+        maxHeight: 900,
+        mimeType: "image/jpeg",
+        quality: 0.82,
+      });
       row.dataset.imageData = dataUrl;
       preview.src = dataUrl;
       if (pathInput) {
@@ -2289,7 +2428,12 @@ const bindEvents = () => {
       const row = target.closest(".list-row");
       const preview = row.querySelector(".image-preview");
       const pathInput = row.querySelector("[data-field='image']");
-      const dataUrl = await readFileAsDataUrl(file);
+      const dataUrl = await resizeImageFile(file, {
+        maxWidth: 600,
+        maxHeight: 600,
+        mimeType: "image/jpeg",
+        quality: 0.82,
+      });
       row.dataset.imageData = dataUrl;
       if (preview) {
         preview.src = dataUrl;
@@ -2348,7 +2492,12 @@ const renderAll = () => {
 const init = async () => {
   const authed = await checkAuth();
   storeData = await loadStoreData();
+  if (authed) {
+    telegramSettings = await loadTelegramSettings();
+  }
   fillInputs();
+  fillTelegramInputs();
+  applyTelegramMode();
   renderAll();
   bindEvents();
   setSaveNote("saveNote", "");

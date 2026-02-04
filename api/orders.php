@@ -20,7 +20,10 @@ $action = trim((string)($body['action'] ?? ''));
 
 if ($action === 'clear') {
     dody_require_auth();
-    dody_save_orders([]);
+    $saved = dody_save_orders([]);
+    if ($saved) {
+        dody_send_telegram("🧹 تم مسح كل الطلبات من لوحة التحكم.");
+    }
     dody_json_response(['ok' => true]);
 }
 
@@ -90,7 +93,11 @@ $order = [
 
 $orders = dody_get_orders();
 array_unshift($orders, $order);
-dody_save_orders($orders);
+$savedOrders = dody_save_orders($orders);
+if (!$savedOrders) {
+    dody_send_telegram("❌ فشل حفظ طلب جديد رقم {$orderId}.");
+    dody_json_response(['ok' => false, 'error' => 'save_failed'], 500);
+}
 
 $store = dody_get_store_data() ?? [];
 $storeName = $store['brand']['name'] ?? 'Dody Store';
@@ -140,5 +147,6 @@ if ($emailTo) {
 }
 
 dody_send_whatsapp($message);
+dody_send_telegram($message);
 
 dody_json_response(['ok' => true, 'order' => $order]);

@@ -99,6 +99,22 @@
         return false;
       }
     },
+    getTelegramSettings: async () => {
+      try {
+        const data = await getJson("telegram.php");
+        return data || null;
+      } catch (error) {
+        return null;
+      }
+    },
+    saveTelegramSettings: async (payload) => {
+      try {
+        await postJson("telegram.php", payload || {});
+        return true;
+      } catch (error) {
+        return false;
+      }
+    },
     fetchOrders: async () => {
       try {
         const data = await getJson("orders.php");
@@ -200,32 +216,35 @@
         }
         return !error;
       },
-      login: async (pin) => {
-        if (!pin) {
+      login: async (email, password) => {
+        if (!email || !password) {
           return false;
         }
-        if (!SUPA_CONFIG?.adminPin) {
+        const { error } = await client.auth.signInWithPassword({ email, password });
+        if (error) {
+          console.warn("Supabase login error", error);
           return false;
         }
-        const ok = pin === String(SUPA_CONFIG.adminPin);
-        if (ok) {
-          localStorage.setItem("dodyAdminAuth", "true");
-        }
-        return ok;
-      },
-      checkAuth: async () => {
-        return localStorage.getItem("dodyAdminAuth") === "true";
-      },
-      logout: async () => {
-        localStorage.removeItem("dodyAdminAuth");
         return true;
       },
-      updatePin: async (pin) => {
-        if (!pin) {
+      checkAuth: async () => {
+        const { data, error } = await client.auth.getSession();
+        if (error) {
           return false;
         }
-        SUPA_CONFIG.adminPin = String(pin);
-        localStorage.setItem("dodySupabasePin", String(pin));
+        return !!data?.session;
+      },
+      logout: async () => {
+        const { error } = await client.auth.signOut();
+        return !error;
+      },
+      updatePin: async () => {
+        return false;
+      },
+      getTelegramSettings: async () => {
+        return null;
+      },
+      saveTelegramSettings: async () => {
         return true;
       },
       fetchOrders: async () => {
@@ -328,6 +347,14 @@
       console.warn(reason);
       return false;
     },
+    getTelegramSettings: async () => {
+      console.warn(reason);
+      return null;
+    },
+    saveTelegramSettings: async () => {
+      console.warn(reason);
+      return false;
+    },
     fetchOrders: async () => {
       console.warn(reason);
       return null;
@@ -390,6 +417,8 @@
     logout: (...args) => proxy("logout", ...args),
     checkAuth: (...args) => proxy("checkAuth", ...args),
     updatePin: (...args) => proxy("updatePin", ...args),
+    getTelegramSettings: (...args) => proxy("getTelegramSettings", ...args),
+    saveTelegramSettings: (...args) => proxy("saveTelegramSettings", ...args),
     fetchOrders: (...args) => proxy("fetchOrders", ...args),
     createOrder: (...args) => proxy("createOrder", ...args),
     clearOrders: (...args) => proxy("clearOrders", ...args),

@@ -34,8 +34,9 @@ if (isset($data['admin'])) {
 $saved = dody_save_store_data($data);
 
 if (!$saved) {
+    dody_send_telegram('❌ فشل حفظ بيانات المتجر.');
     dody_json_response(['ok' => false, 'error' => 'save_failed'], 500);
 }
 
+dody_send_telegram('✅ تم تحديث بيانات المتجر من لوحة التحكم.');
 dody_json_response(['ok' => true]);
-

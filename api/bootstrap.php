@@ -83,6 +83,11 @@ function dody_get_settings(): array
                 'phone_id' => '',
                 'to' => '',
             ],
+            'telegram' => [
+                'token' => '',
+                'chat_id' => '',
+                'enabled' => true,
+            ],
         ];
         dody_write_json_file($path, $defaults);
         return $defaults;
@@ -104,6 +109,13 @@ function dody_get_settings(): array
             'token' => '',
             'phone_id' => '',
             'to' => '',
+        ];
+    }
+    if (!isset($settings['telegram']) || !is_array($settings['telegram'])) {
+        $settings['telegram'] = [
+            'token' => '',
+            'chat_id' => '',
+            'enabled' => true,
         ];
     }
 
@@ -219,3 +231,62 @@ function dody_send_whatsapp(string $message): bool
     return $response !== false && $status >= 200 && $status < 300;
 }
 
+function dody_get_telegram_config(): array
+{
+    $settings = dody_get_settings();
+    $telegram = $settings['telegram'] ?? [];
+    $token = trim((string)(getenv('TELEGRAM_BOT_TOKEN') ?: ($telegram['token'] ?? '')));
+    $chatId = trim((string)(getenv('TELEGRAM_CHAT_ID') ?: ($telegram['chat_id'] ?? '')));
+    $enabled = $telegram['enabled'] ?? true;
+    return [
+        'token' => $token,
+        'chat_id' => $chatId,
+        'enabled' => (bool)$enabled,
+    ];
+}
+
+function dody_send_telegram(string $message): bool
+{
+    $config = dody_get_telegram_config();
+    if (!$config['enabled']) {
+        return false;
+    }
+    $token = $config['token'];
+    $chatId = $config['chat_id'];
+    if (!$token || !$chatId) {
+        return false;
+    }
+    if (!function_exists('curl_init')) {
+        return false;
+    }
+
+    $text = trim($message);
+    if (function_exists('mb_substr')) {
+        $text = mb_substr($text, 0, 3800);
+    } else {
+        $text = substr($text, 0, 3800);
+    }
+
+    $payload = [
+        'chat_id' => $chatId,
+        'text' => $text,
+        'disable_web_page_preview' => true,
+    ];
+
+    $url = 'https://api.telegram.org/bot' . $token . '/sendMessage';
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/json',
+        ],
+        CURLOPT_POSTFIELDS => json_encode($payload, JSON_UNESCAPED_UNICODE),
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 10,
+    ]);
+    $response = curl_exec($ch);
+    $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    return $response !== false && $status >= 200 && $status < 300;
+}

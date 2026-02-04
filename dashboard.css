@@ -270,6 +270,11 @@
   grid-column: 1 / -1;
 }
 
+.form-grid .muted {
+  grid-column: 1 / -1;
+  font-size: 12px;
+}
+
 .list-block {
   margin-top: 20px;
 }

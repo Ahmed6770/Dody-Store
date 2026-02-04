@@ -32,7 +32,12 @@ if ($index === null) {
 
 if ($action === 'delete') {
     array_splice($orders, $index, 1);
-    dody_save_orders($orders);
+    $saved = dody_save_orders($orders);
+    if (!$saved) {
+        dody_send_telegram("❌ فشل حذف الطلب رقم {$orderId}.");
+        dody_json_response(['ok' => false, 'error' => 'save_failed'], 500);
+    }
+    dody_send_telegram("🗑️ تم حذف الطلب رقم {$orderId}.");
     dody_json_response(['ok' => true]);
 }
 
@@ -60,7 +65,18 @@ if ($deliveryFee !== null) {
     $orders[$index]['deliveryFee'] = max($deliveryFee, 0);
 }
 
-dody_save_orders($orders);
+$saved = dody_save_orders($orders);
+if (!$saved) {
+    dody_send_telegram("❌ فشل تحديث الطلب رقم {$orderId}.");
+    dody_json_response(['ok' => false, 'error' => 'save_failed'], 500);
+}
+
+$statusText = $status !== '' ? "الحالة: {$status}" : "";
+$shippingText = $shippingStatus !== '' ? "الشحن: {$shippingStatus}" : "";
+$feeText = $deliveryFee !== null ? "التوصيل: {$orders[$index]['deliveryFee']}" : "";
+$lines = array_filter([$statusText, $shippingText, $feeText]);
+if (count($lines) > 0) {
+    dody_send_telegram("✏️ تحديث الطلب رقم {$orderId}.\n" . implode("\n", $lines));
+}
 
 dody_json_response(['ok' => true, 'order' => $orders[$index]]);
-
