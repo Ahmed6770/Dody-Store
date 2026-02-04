@@ -1059,6 +1059,21 @@ const sendOrderEmail = (formData, order) => {
   });
 };
 
+const sendOrderWhatsAppNotify = (formData, order) => {
+  const number = storeData.notifications?.whatsapp?.number || "";
+  const apiKey = storeData.notifications?.whatsapp?.apiKey || "";
+  if (!number || !apiKey) {
+    return;
+  }
+  const message = buildOrderMessage(formData, order.id);
+  const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(
+    number
+  )}&text=${encodeURIComponent(message)}&apikey=${encodeURIComponent(apiKey)}`;
+  fetch(url).catch(() => {
+    // silent fail
+  });
+};
+
 const buildOrderMessage = (formData, orderId) => {
   const itemsLines = cart
     .map((item) => {
@@ -1327,6 +1342,13 @@ orderForm.addEventListener("submit", async (event) => {
   orderStatus.dataset.orderId = savedOrder.id;
   updateOrderStatus("orderSuccess", "success");
 
+  sendOrderEmail({ name, phone, address, notes }, savedOrder);
+  sendOrderWhatsAppNotify({ name, phone, address, notes }, savedOrder);
+
+  const message = buildOrderMessage({ name, phone, address, notes }, savedOrder.id);
+  const url = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+
   cart = [];
   renderCart();
   orderForm.reset();
@@ -1458,6 +1480,7 @@ const initApp = async () => {
     orderStatus.dataset.key = "orderHint";
     orderStatus.dataset.type = "hint";
   }
+  mountEmailForm();
   applyTranslations();
 
   const urlParams = new URLSearchParams(window.location.search);
