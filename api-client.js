@@ -277,6 +277,53 @@
 
   let activeAdapter = phpAdapter;
 
+  const buildDisabledAdapter = (reason) => ({
+    fetchStoreData: async () => {
+      console.warn(reason);
+      return null;
+    },
+    saveStoreData: async () => {
+      console.warn(reason);
+      return false;
+    },
+    login: async () => {
+      console.warn(reason);
+      return false;
+    },
+    checkAuth: async () => {
+      console.warn(reason);
+      return false;
+    },
+    logout: async () => {
+      console.warn(reason);
+      return false;
+    },
+    updatePin: async () => {
+      console.warn(reason);
+      return false;
+    },
+    fetchOrders: async () => {
+      console.warn(reason);
+      return null;
+    },
+    createOrder: async () => {
+      console.warn(reason);
+      return null;
+    },
+    clearOrders: async () => {
+      console.warn(reason);
+      return false;
+    },
+    updateOrder: async () => {
+      console.warn(reason);
+      return null;
+    },
+    deleteOrder: async () => {
+      console.warn(reason);
+      return false;
+    }
+  });
+
   const pickAdapter = async () => {
     if (BACKEND_MODE === "php") {
       activeAdapter = phpAdapter;
@@ -284,7 +331,13 @@
     }
     const supaAdapter = createSupabaseAdapter();
     if (BACKEND_MODE === "supabase") {
-      activeAdapter = supaAdapter || phpAdapter;
+      if (supaAdapter) {
+        activeAdapter = supaAdapter;
+      } else {
+        activeAdapter = buildDisabledAdapter(
+          "Supabase adapter not ready. Check supabase script + DODY_SUPABASE config."
+        );
+      }
       return;
     }
     // auto
