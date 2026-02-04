@@ -232,7 +232,7 @@
         const { data, error } = await client
           .from("orders")
           .select("*")
-          .order("created_at", { ascending: false });
+          .order("date", { ascending: false });
         if (error) {
           console.warn("Supabase orders fetch error", error);
           return null;
