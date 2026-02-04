@@ -1,4 +1,4 @@
-﻿?const adminGate = document.getElementById("adminGate");
+﻿const adminGate = document.getElementById("adminGate");
 const adminEmailInput = document.getElementById("adminEmailInput");
 const adminPasswordInput = document.getElementById("adminPasswordInput");
 const adminLoginBtn = document.getElementById("adminLoginBtn");
@@ -20,82 +20,78 @@ let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 
 const i18n = {
   ar: {
-    adminTitle: "دخ�^�" �"�^حة ا�"تح�f�.",
-    adminDesc: "???? ?????? ????? ???????",
-    adminLogin: "دخ�^�"",
-    adminHint: "???? ?? ?????? ????? ??????",
-    adminPinError: "ا�"ر�.ز غ�Sر صح�Sح.",
-    adminPinPlaceholder: "�?��?��?��?�",
-    adminLoginError: "?????? ?????? ??? ?????.",
-    adminEmailPlaceholder: "?????? ??????????",
-    adminPasswordPlaceholder: "???? ??????",
-    dashTitle: "�"�^حة تح�f�. Dody Store",
-    dashSubtitle: "إدارة ا�"�.حت�^�? �^ا�"ط�"بات بس�?�^�"ة",
-    navOverview: "�?ظرة عا�.ة",
-    navGeneral: "ا�"إعدادات ا�"عا�.ة",
-    navHero: "ا�"�?�Sر�^ �^ا�"با�,ات",
-    navSections: "ع�?ا�^�S�? ا�"أ�,سا�.",
-    navCategories: "أ�?�^اع ا�"�.�?تجات",
-    navCollections: "ا�"با�,ات ا�"جا�?زة",
-    navProducts: "ا�"�.�?تجات",
-    navIngredients: "ا�"�.�f�^�?ات",
-    navTestimonials: "آراء ا�"ع�.�"اء",
-    navAbout: "ع�? ا�"�.تجر",
-    navContactCta: "ت�^اص�" �^اتساب",
-    navOrders: "ا�"ط�"بات",
-    navToggle: "ا�"�,ائ�.ة",
-    ordersPageTitle: "إدارة ا�"ط�"بات",
-    ordersPageSubtitle: "تابع�S ا�"حا�"ات�O ا�"شح�?�O �^ا�"تفاص�S�" بسرعة.",
-    exportExcel: "تصد�Sر Excel",
-    backToDashboard: "رج�^ع �"�"�^حة",
-    backToSite: "رج�^ع �"�"�.�^�,ع",
-    ordersTitle: "ا�"ط�"بات",
-    clearOrders: "�.سح �f�" ا�"ط�"بات",
-    summaryOrders: "إج�.ا�"�S ا�"ط�"بات",
-    summaryNew: "ط�"بات جد�Sدة",
-    summaryProcessing: "�,�Sد ا�"ت�?ف�Sذ",
-    summaryRevenue: "إج�.ا�"�S ا�"�.ب�Sعات",
-    summaryCancelled: "�.�"غاة",
-    ordersSummary: "عدد ا�"ط�"بات",
-    ordersSummaryNew: "جد�Sدة",
-    ordersSummaryCancelled: "�.�"غاة",
-    ordersSummaryFiltered: "ا�"�.عر�^ض",
-    ordersFilterLabel: "ف�"ترة ا�"ط�"بات",
+    adminTitle: "دخول لوحة التحكم",
+    adminDesc: "سجّل الدخول بحساب الإدارة.",
+    adminLogin: "دخول",
+    adminHint: "تأكد من البريد وكلمة المرور.",
+    adminLoginError: "بيانات الدخول غير صحيحة.",
+    adminEmailPlaceholder: "البريد الإلكتروني",
+    adminPasswordPlaceholder: "كلمة المرور",
+    dashTitle: "لوحة تحكم Dody Store",
+    dashSubtitle: "إدارة المحتوى والطلبات بسهولة",
+    navOverview: "نظرة عامة",
+    navGeneral: "الإعدادات العامة",
+    navHero: "الهيرو والباقات",
+    navSections: "عناوين الأقسام",
+    navCategories: "أنواع المنتجات",
+    navCollections: "الباقات الجاهزة",
+    navProducts: "المنتجات",
+    navIngredients: "المكونات",
+    navTestimonials: "آراء العملاء",
+    navAbout: "عن المتجر",
+    navContactCta: "تواصل واتساب",
+    navOrders: "الطلبات",
+    navToggle: "القائمة",
+    ordersPageTitle: "إدارة الطلبات",
+    ordersPageSubtitle: "تابعي الحالات، الشحن، والتفاصيل بسرعة.",
+    exportExcel: "تصدير Excel",
+    backToDashboard: "رجوع للوحة",
+    backToSite: "رجوع للموقع",
+    ordersTitle: "الطلبات",
+    clearOrders: "مسح كل الطلبات",
+    summaryOrders: "إجمالي الطلبات",
+    summaryNew: "طلبات جديدة",
+    summaryProcessing: "قيد التنفيذ",
+    summaryRevenue: "إجمالي المبيعات",
+    summaryCancelled: "ملغاة",
+    ordersSummary: "عدد الطلبات",
+    ordersSummaryNew: "جديدة",
+    ordersSummaryCancelled: "ملغاة",
+    ordersSummaryFiltered: "المعروض",
+    ordersFilterLabel: "فلترة الطلبات",
     ordersSearchLabel: "بحث",
-    ordersSearchPlaceholder: "اس�. / ر�,�. / �?اتف",
-    filterAll: "ا�"�f�"",
-    ordersHeaderCustomer: "ا�"ع�.�S�"",
-    ordersHeaderId: "ر�,�. ا�"ط�"ب",
-    ordersHeaderDate: "ا�"تار�Sخ",
-    ordersHeaderTotals: "ا�"�.دف�^عات",
-    ordersHeaderStatus: "ا�"حا�"ة",
-    ordersHeaderActions: "ا�"إجراءات",
-    ordersHeaderShipping: "ا�"شح�?",
-    ordersHeaderItems: "ا�"�.�?تجات",
-    ordersTotalLabel: "ا�"إج�.ا�"�S",
-    ordersDeliveryLabel: "ا�"ت�^ص�S�"",
-    ordersNetLabel: "ا�"صاف�S",
-    statusNew: "جد�Sد",
-    statusProcessing: "�,�Sد ا�"ت�?ف�Sذ",
-    statusDone: "ت�. ا�"تس�"�S�.",
-    statusCancelled: "�.�"غ�S",
-    shippingPending: "�"�. �Sت�. ا�"شح�?",
-    shippingShipped: "ت�. ا�"شح�?",
-    viewDetails: "تفاص�S�"",
-    whatsappAction: "�^اتساب",
+    ordersSearchPlaceholder: "اسم / رقم / هاتف",
+    filterAll: "الكل",
+    ordersHeaderCustomer: "العميل",
+    ordersHeaderId: "رقم الطلب",
+    ordersHeaderDate: "التاريخ",
+    ordersHeaderTotals: "المدفوعات",
+    ordersHeaderStatus: "الحالة",
+    ordersHeaderActions: "الإجراءات",
+    ordersHeaderShipping: "الشحن",
+    ordersHeaderItems: "المنتجات",
+    ordersTotalLabel: "الإجمالي",
+    ordersDeliveryLabel: "التوصيل",
+    ordersNetLabel: "الصافي",
+    statusNew: "جديد",
+    statusProcessing: "قيد التنفيذ",
+    statusDone: "تم التسليم",
+    statusCancelled: "ملغاة",
+    shippingPending: "لم يتم الشحن",
+    shippingShipped: "تم الشحن",
+    viewDetails: "تفاصيل",
+    whatsappAction: "واتساب",
     removeOrder: "حذف",
-    confirmRemoveOrder: "�?�" تر�Sد حذف ا�"ط�"ب�Y",
-    noOrders: "�"ا �S�^جد ط�"بات حت�? ا�"آ�?.",
-    confirmClearOrders: "�?�" تر�Sد �.سح �f�" ا�"ط�"بات�Y",
-    exportEmpty: "�"ا �S�^جد ب�Sا�?ات �"تصد�Sر�?ا."
+    confirmRemoveOrder: "هل تريد حذف الطلب؟",
+    noOrders: "لا توجد طلبات حتى الآن.",
+    confirmClearOrders: "هل تريد مسح كل الطلبات؟",
+    exportEmpty: "لا يوجد بيانات لتصديرها."
   },
   en: {
     adminTitle: "Admin Access",
     adminDesc: "Sign in with your admin account.",
     adminLogin: "Login",
     adminHint: "Check your email and password.",
-    adminPinError: "Incorrect PIN.",
-    adminPinPlaceholder: "�?��?��?��?�",
     adminLoginError: "Incorrect login details.",
     adminEmailPlaceholder: "Email address",
     adminPasswordPlaceholder: "Password",
@@ -163,7 +159,7 @@ const i18n = {
 
 const t = (key) => i18n[dashLang]?.[key] || key;
 const getLocale = () => (dashLang === "ar" ? "ar-EG" : "en-US");
-const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "ج�?�S�?" : "EGP"}`;
+const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "جنيه" : "EGP"}`;
 
 const defaultData = window.DODY_DEFAULT_DATA || {};
 const deepClone = (data) => JSON.parse(JSON.stringify(data));
@@ -245,12 +241,7 @@ const applyOrderFilters = (orders) => {
   if (orderSearchTerm) {
     const term = orderSearchTerm.toLowerCase();
     filtered = filtered.filter((order) => {
-      const haystack = [
-        order.id,
-        order.name,
-        order.phone,
-        order.address
-      ]
+      const haystack = [order.id, order.name, order.phone, order.address]
         .map((value) => String(value || "").toLowerCase())
         .join(" ");
       return haystack.includes(term);
@@ -302,7 +293,7 @@ const applyLang = () => {
   });
 
   if (ordersLangToggle) {
-    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "عرب�S";
+    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "عربي";
   }
 
   document.title = `${t("ordersPageTitle")} | Dody Store`;
@@ -358,7 +349,7 @@ const buildOrdersRow = (order) => {
 
   const waMessage =
     dashLang === "ar"
-      ? `�.رحبا�< ${order.name}�O ب�?أ�fد ط�"ب�f ر�,�. ${order.id}.`
+      ? `مرحباً ${order.name}، بنأكد طلبك رقم ${order.id}.`
       : `Hi ${order.name}, we're confirming your order #${order.id}.`;
   const waLink = `https://wa.me/${formatPhone(order.phone)}?text=${encodeURIComponent(
     waMessage
@@ -461,8 +452,6 @@ const refreshOrders = async () => {
   const orders = await window.DodyApi?.fetchOrders?.();
   if (Array.isArray(orders)) {
     setOrders(orders);
-  } else {
-    setOrders([]);
   }
   renderSummary();
   renderOrders();
@@ -526,8 +515,7 @@ const exportOrdersToExcel = () => {
     const net = Math.max(total - deliveryFee, 0);
     const items = (order.items || [])
       .map((item) => {
-        const name =
-          dashLang === "ar" ? item.nameAr || item.nameEn : item.nameEn || item.nameAr;
+        const name = dashLang === "ar" ? item.nameAr || item.nameEn : item.nameEn || item.nameAr;
         return `${name} x${item.qty}`;
       })
       .join(" | ");
@@ -559,8 +547,7 @@ const exportOrdersToExcel = () => {
 
   const tableRows = [headers, ...rows]
     .map(
-      (row) =>
-        `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`
+      (row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`
     )
     .join("");
 
@@ -736,4 +723,3 @@ const init = async () => {
 };
 
 init();
-

@@ -1525,8 +1525,6 @@ const refreshOrders = async () => {
   const orders = await window.DodyApi?.fetchOrders?.();
   if (Array.isArray(orders)) {
     setOrders(orders);
-  } else {
-    setOrders([]);
   }
   renderSummary();
   renderOrders();
