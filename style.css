@@ -1271,13 +1271,70 @@ body.ltr .cart-drawer.open {
 }
 
 @media (max-width: 680px) {
-  .hero {
-    padding-top: 50px;
+  .nav {
+    padding: 10px 12px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .brand {
+    gap: 8px;
+  }
+
+  .brand-logo,
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .brand-name {
+    font-size: 15px;
+  }
+
+  .brand-tag {
+    display: none;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    font-size: 11px;
+    text-align: center;
+  }
+
+  .nav-links a {
+    padding: 6px 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(110, 95, 87, 0.12);
   }
 
   .nav-cta {
-    width: 100%;
-    justify-content: center;
+    order: 2;
+    width: auto;
+    margin-inline-start: auto;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+
+  .nav-cta .ghost,
+  .nav-cta .cart {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .cart-count {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
+
+  .hero {
+    padding-top: 50px;
   }
 }
 
