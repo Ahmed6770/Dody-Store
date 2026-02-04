@@ -275,7 +275,8 @@
     };
   };
 
-  let activeAdapter = phpAdapter;
+  let activeAdapter = null;
+  let adapterReady = null;
 
   const buildDisabledAdapter = (reason) => ({
     fetchStoreData: async () => {
@@ -350,9 +351,10 @@
   };
 
   const proxy = async (fn, ...args) => {
-    if (!activeAdapter) {
-      await pickAdapter();
+    if (!adapterReady) {
+      adapterReady = pickAdapter();
     }
+    await adapterReady;
     return activeAdapter[fn](...args);
   };
 
@@ -370,5 +372,5 @@
     deleteOrder: (...args) => proxy("deleteOrder", ...args)
   };
 
-  pickAdapter();
+  adapterReady = pickAdapter();
 })();
