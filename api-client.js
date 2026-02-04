@@ -148,20 +148,18 @@
     const client = window.supabase.createClient(SUPA_CONFIG.url, SUPA_CONFIG.anonKey);
 
     const getNextOrderId = async () => {
-      let lastSeq = 10000;
-      const { data, error } = await client
-        .from("orders")
-        .select("id")
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (!error && Array.isArray(data) && data[0]?.id) {
-        const rawId = String(data[0].id);
-        const parsed = Number(rawId.replace(/^\D+/, ""));
-        if (Number.isFinite(parsed)) {
-          lastSeq = Math.max(lastSeq, parsed);
+      const baseSeq = 10000;
+      try {
+        const { count, error } = await client
+          .from("orders")
+          .select("id", { count: "exact", head: true });
+        if (!error && typeof count === "number") {
+          return `DS-${baseSeq + count + 1}`;
         }
+      } catch (error) {
+        // ignore
       }
-      return `DS-${lastSeq + 1}`;
+      return `DS-${baseSeq + Math.floor(Date.now() / 1000)}`;
     };
 
     const mapOrderRow = (row) => ({
