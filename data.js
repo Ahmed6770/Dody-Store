@@ -620,3 +620,11 @@
     }
   }
 };
+
+window.DODY_API_BASE = "api";
+window.DODY_BACKEND = "supabase";
+window.DODY_SUPABASE = {
+  url: "https://pttzwbyjierbcktjdzp.supabase.co",
+  anonKey: "sb_publishable_QKSn5CqqIhC_-_mzJfS2ow_uQ2nR",
+  adminPin: localStorage.getItem("dodySupabasePin") || "2026"
+};
