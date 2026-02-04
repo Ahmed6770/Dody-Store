@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تفاصيل الطلب | Dody Store</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body class="dashboard">
+    <header class="dash-header">
+      <div class="dash-brand">
+        <img id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+        <div>
+          <h1 id="pageTitle" data-i18n="pageTitle">تفاصيل الطلب</h1>
+          <p id="pageSubtitle" data-i18n="pageSubtitle">متابعة وإدارة الطلب</p>
+        </div>
+      </div>
+      <div class="dash-actions">
+        <button class="ghost" id="detailsLangToggle">English</button>
+        <a class="ghost" href="orders.html" data-i18n="backToDashboard">رجوع للطلبات</a>
+      </div>
+    </header>
+
+    <main class="order-details">
+      <div class="order-details-card" id="orderCard" hidden>
+        <div class="order-details-header">
+          <div>
+            <h2>
+              <span data-i18n="orderInfoTitle">تفاصيل الطلب</span>
+              <span class="muted">#</span>
+              <span id="orderId">---</span>
+            </h2>
+            <p class="muted" id="orderDate"></p>
+          </div>
+          <div class="order-tools">
+            <select id="orderStatus"></select>
+            <select id="shippingStatus"></select>
+            <a class="whatsapp-btn" id="orderWhatsapp" target="_blank" rel="noreferrer" data-i18n="whatsappAction">واتساب</a>
+            <button class="ghost" id="removeOrderBtn" data-i18n="removeOrder">حذف الطلب</button>
+          </div>
+        </div>
+
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="muted" data-i18n="customerLabel">العميل</span>
+            <strong id="orderCustomer">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="phoneLabel">الهاتف</span>
+            <strong id="orderPhone">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="addressLabel">العنوان</span>
+            <strong id="orderAddress">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="notesLabel">ملاحظات</span>
+            <strong id="orderNotes">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="paymentLabel">طريقة الدفع</span>
+            <strong id="orderPayment">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="totalLabel">الإجمالي</span>
+            <strong id="orderTotal">-</strong>
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="deliveryFeeLabel">سعر التوصيل</span>
+            <input id="deliveryFeeInput" type="number" min="0" />
+          </div>
+          <div class="detail-item">
+            <span class="muted" data-i18n="netLabel">صافي الربح</span>
+            <strong id="orderNet">-</strong>
+          </div>
+        </div>
+
+        <div>
+          <h3 data-i18n="itemsTitle">المنتجات المطلوبة</h3>
+          <ul class="detail-list" id="orderItems"></ul>
+        </div>
+      </div>
+    </main>
+
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="order-details.js"></script>
+  </body>
+</html>

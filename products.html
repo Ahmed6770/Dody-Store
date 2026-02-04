@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>كل المنتجات | Dody Store</title>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <div class="brand">
+          <img class="brand-logo" id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+          <div class="brand-text">
+            <span class="brand-name" id="brandName">Dody Store</span>
+            <span class="brand-tag" id="brandTag">عناية ومكياج بإحساس عصري</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="index.html" data-i18n="navHome">الرئيسية</a>
+          <a href="index.html#collections" data-i18n="navBundles">الباقات</a>
+          <a href="index.html#about" data-i18n="navAbout">قصتنا</a>
+          <a href="index.html#contact" data-i18n="navContact">تواصل</a>
+        </div>
+        <div class="nav-cta">
+          <button class="ghost lang-toggle" id="langToggle">English</button>
+          <button class="cart" id="cartButton" type="button">
+            <span data-i18n="cartBtn">السلة</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1 data-i18n="productsPageTitle">كل المنتجات</h1>
+        <p data-i18n="productsPageDesc">كل الأصناف متاحة مع تفاصيل كاملة وصور واضحة.</p>
+        <div class="delivery-note" id="deliveryNote"></div>
+      </section>
+
+      <section id="products" class="products">
+        <div class="filter-tabs" id="filterTabs" role="tablist"></div>
+        <div class="filter-bar">
+          <label class="filter-field">
+            <span data-i18n="filterMin">السعر من</span>
+            <input type="number" id="minPrice" min="0" />
+          </label>
+          <label class="filter-field">
+            <span data-i18n="filterMax">السعر إلى</span>
+            <input type="number" id="maxPrice" min="0" />
+          </label>
+          <label class="filter-check">
+            <input type="checkbox" id="availableOnly" />
+            <span data-i18n="filterAvailable">متوفر فقط</span>
+          </label>
+          <button class="ghost" id="clearFilters" type="button" data-i18n="filterClear">
+            مسح الفلتر
+          </button>
+        </div>
+        <div class="product-grid" id="productGrid"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <h3>Dody Store</h3>
+          <p id="footerDesc">متجر عناية بالبشرة ومكياج بتجربة عربية عصرية.</p>
+        </div>
+        <div>
+          <h4 data-i18n="footerServices">خدماتنا</h4>
+          <ul id="footerServicesList"></ul>
+        </div>
+        <div>
+          <h4 data-i18n="footerContact">التواصل</h4>
+          <ul>
+            <li id="footerWhatsapp">واتساب: 0112 345 6789</li>
+            <li id="footerInsta">إنستجرام: @dody.store</li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="footerHours">ساعات العمل</h4>
+          <p id="footerHours">كل يوم من 10 صباحًا حتى 10 مساءً</p>
+        </div>
+      </div>
+      <p class="copyright" id="copyright" data-i18n="copyright">
+        © 2026 Dody Store. كل الحقوق محفوظة.
+      </p>
+    </footer>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="data.js"></script>
+    <script src="products.js"></script>
+  </body>
+</html>

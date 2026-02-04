@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-label="Liquid Lipstick">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f8d6dc" />
+      <stop offset="100%" stop-color="#e7a2b2" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" rx="36" fill="url(#bg)" />
+  <rect x="205" y="60" width="70" height="240" rx="24" fill="#ffffff" stroke="#e2a1b0" stroke-width="2" />
+  <rect x="210" y="40" width="60" height="22" rx="8" fill="#ffffff" />
+  <rect x="215" y="150" width="50" height="80" rx="18" fill="#e7a2b2" />
+  <text x="240" y="192" text-anchor="middle" font-size="13" font-family="Arial, sans-serif" font-weight="700" fill="#8b3b4d">Lip</text>
+  <text x="240" y="300" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#6e5f57">Matte</text>
+</svg>

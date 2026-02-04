@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تفاصيل المنتج | Dody Store</title>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <div class="brand">
+          <img class="brand-logo" id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+          <div class="brand-text">
+            <span class="brand-name" id="brandName">Dody Store</span>
+            <span class="brand-tag" id="brandTag">عناية ومكياج بإحساس عصري</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="index.html" data-i18n="navHome">الرئيسية</a>
+          <a href="products.html" data-i18n="navAllProducts">كل المنتجات</a>
+          <a href="index.html#contact" data-i18n="navContact">تواصل</a>
+        </div>
+        <div class="nav-cta">
+          <button class="ghost lang-toggle" id="langToggle">English</button>
+          <button class="cart" id="cartButton" type="button">
+            <span data-i18n="cartBtn">السلة</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="product-details">
+      <div class="product-details-card" id="productCard" hidden>
+        <div class="product-details-media">
+          <img id="productImage" src="" alt="" />
+        </div>
+        <div class="product-details-info">
+          <div class="product-badges">
+            <span class="product-badge" id="productTag"></span>
+            <span class="product-badge" id="productStatus"></span>
+            <span class="product-badge" id="productDelivery"></span>
+          </div>
+          <h1 id="productName">---</h1>
+          <p id="productDesc">---</p>
+          <div class="product-details-actions">
+            <span class="price" id="productPrice">0</span>
+            <button class="mini" id="addToCartBtn" data-i18n="addToCart">أضيفي للسلة</button>
+            <button class="ghost" id="askProductBtn" data-i18n="askProduct">اسألي عن المنتج</button>
+            <a class="ghost" href="products.html" data-i18n="backToProducts">رجوع للمنتجات</a>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="data.js"></script>
+    <script src="product-details.js"></script>
+  </body>
+</html>

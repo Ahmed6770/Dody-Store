@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-label="Bundle">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbe9df" />
+      <stop offset="100%" stop-color="#f0c7b6" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" rx="36" fill="url(#bg)" />
+  <rect x="130" y="110" width="80" height="160" rx="20" fill="#ffffff" stroke="#e7b7a3" stroke-width="2" />
+  <rect x="210" y="90" width="80" height="180" rx="20" fill="#ffffff" stroke="#e7b7a3" stroke-width="2" />
+  <rect x="290" y="120" width="60" height="150" rx="18" fill="#ffffff" stroke="#e7b7a3" stroke-width="2" />
+  <text x="240" y="80" text-anchor="middle" font-size="16" font-family="Arial, sans-serif" font-weight="700" fill="#a3563f">Bundle</text>
+  <text x="240" y="320" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#6e5f57">5 steps</text>
+</svg>

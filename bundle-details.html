@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تفاصيل الباقة | Dody Store</title>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <div class="brand">
+          <img class="brand-logo" id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+          <div class="brand-text">
+            <span class="brand-name" id="brandName">Dody Store</span>
+            <span class="brand-tag" id="brandTag">عناية ومكياج بإحساس عصري</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="index.html" data-i18n="navHome">الرئيسية</a>
+          <a href="products.html" data-i18n="navAllProducts">كل المنتجات</a>
+          <a href="index.html#contact" data-i18n="navContact">تواصل</a>
+        </div>
+        <div class="nav-cta">
+          <button class="ghost lang-toggle" id="langToggle">English</button>
+          <button class="cart" id="cartButton" type="button">
+            <span data-i18n="cartBtn">السلة</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main class="product-details">
+      <div class="product-details-card" id="bundleCard" hidden>
+        <div class="product-details-media">
+          <img id="bundleImage" src="" alt="" />
+        </div>
+        <div class="product-details-info">
+          <div class="product-badges">
+            <span class="product-badge" id="bundleCount"></span>
+            <span class="product-badge" id="bundleDelivery"></span>
+          </div>
+          <h1 id="bundleName">---</h1>
+          <p id="bundleDesc">---</p>
+          <div class="product-details-actions">
+            <span class="price" id="bundlePrice">0</span>
+            <button class="mini" id="bundleAddBtn" data-i18n="addToCart">أضيفي للسلة</button>
+            <a class="ghost" href="index.html#collections" data-i18n="backToBundles">رجوع للباقات</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="product-details-card" id="bundleNotFound" hidden>
+        <h2 data-i18n="notFoundTitle">الباقة غير موجودة</h2>
+        <p class="muted" data-i18n="notFoundDesc">ارجعي للرئيسية لاختيار باقة أخرى.</p>
+      </div>
+
+      <div class="product-details-card" id="bundleItemsCard" hidden>
+        <h2 data-i18n="bundleItemsTitle">محتويات الباقة</h2>
+        <div class="bundle-items" id="bundleItems"></div>
+      </div>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="data.js"></script>
+    <script src="bundle-details.js"></script>
+  </body>
+</html>

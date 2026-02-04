@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-label="Gentle Gel Cleanser">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8f4f3" />
+      <stop offset="100%" stop-color="#cfe5e3" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" rx="36" fill="url(#bg)" />
+  <rect x="200" y="60" width="80" height="26" rx="10" fill="#ffffff" />
+  <rect x="185" y="86" width="110" height="210" rx="24" fill="#ffffff" stroke="#c1d7d5" stroke-width="2" />
+  <rect x="205" y="130" width="70" height="80" rx="18" fill="#cfe5e3" />
+  <text x="240" y="190" text-anchor="middle" font-size="15" font-family="Arial, sans-serif" font-weight="700" fill="#3b6e6a">Clean</text>
+  <text x="240" y="300" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#6e5f57">150ml</text>
+</svg>

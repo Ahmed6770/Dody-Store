@@ -1,0 +1,14 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360" role="img" aria-label="Concealer">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f2f0eb" />
+      <stop offset="100%" stop-color="#d9d5cc" />
+    </linearGradient>
+  </defs>
+  <rect width="480" height="360" rx="36" fill="url(#bg)" />
+  <rect x="210" y="60" width="60" height="240" rx="22" fill="#ffffff" stroke="#d4cfc6" stroke-width="2" />
+  <rect x="218" y="40" width="44" height="22" rx="8" fill="#ffffff" />
+  <rect x="220" y="140" width="40" height="80" rx="16" fill="#d9d5cc" />
+  <text x="240" y="190" text-anchor="middle" font-size="13" font-family="Arial, sans-serif" font-weight="700" fill="#7d7468">Concealer</text>
+  <text x="240" y="300" text-anchor="middle" font-size="14" font-family="Arial, sans-serif" fill="#6e5f57">10ml</text>
+</svg>

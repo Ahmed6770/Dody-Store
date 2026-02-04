@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>الطلبات | Dody Store</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body class="dashboard">
+    <div class="admin-gate" id="adminGate" aria-hidden="true">
+      <div class="admin-card">
+        <h2 data-i18n="adminTitle">دخول لوحة التحكم</h2>
+        <p data-i18n="adminDesc">أدخل الرمز السري للوصول إلى لوحة الإدارة.</p>
+        <input
+          id="adminPinInput"
+          type="password"
+          placeholder="••••"
+          data-i18n-placeholder="adminPinPlaceholder"
+        />
+        <button class="primary" id="adminPinBtn" data-i18n="adminLogin">دخول</button>
+        <p class="admin-hint" id="adminPinHint" data-i18n="adminHint"></p>
+      </div>
+    </div>
+
+    <div class="dash-layout">
+      <aside class="dash-sidebar" id="dashSidebar">
+        <div class="dash-sidebar-head">
+          <div class="dash-brand">
+            <img src="assets/logo.svg" alt="Dody Store logo" />
+            <div>
+              <h2 data-i18n="dashTitle">لوحة تحكم Dody Store</h2>
+              <p data-i18n="dashSubtitle">إدارة المحتوى والطلبات بسهولة</p>
+            </div>
+          </div>
+        </div>
+        <nav class="dash-nav">
+          <a class="nav-link" href="dashboard.html#summary" data-i18n="navOverview">نظرة عامة</a>
+          <a class="nav-link" href="dashboard.html#general" data-i18n="navGeneral">الإعدادات العامة</a>
+          <a class="nav-link" href="dashboard.html#hero" data-i18n="navHero">الهيرو والباقات</a>
+          <a class="nav-link" href="dashboard.html#sections" data-i18n="navSections">عناوين الأقسام</a>
+          <a class="nav-link" href="dashboard.html#categories" data-i18n="navCategories">أنواع المنتجات</a>
+          <a class="nav-link" href="dashboard.html#collections" data-i18n="navCollections">الباقات الجاهزة</a>
+          <a class="nav-link" href="dashboard.html#products" data-i18n="navProducts">المنتجات</a>
+          <a class="nav-link" href="dashboard.html#ingredients" data-i18n="navIngredients">المكونات</a>
+          <a class="nav-link" href="dashboard.html#testimonials" data-i18n="navTestimonials">آراء العملاء</a>
+          <a class="nav-link" href="dashboard.html#about" data-i18n="navAbout">عن المتجر</a>
+          <a class="nav-link" href="dashboard.html#contactCta" data-i18n="navContactCta">تواصل واتساب</a>
+          <a class="nav-link nav-orders active" href="orders.html" data-i18n="navOrders">الطلبات</a>
+        </nav>
+      </aside>
+      <div class="dash-overlay" id="sidebarOverlay"></div>
+      <div class="dash-content">
+        <header class="dash-header">
+          <div class="dash-brand">
+            <img id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+            <div>
+              <h1 data-i18n="ordersPageTitle">إدارة الطلبات</h1>
+              <p data-i18n="ordersPageSubtitle">تابعي الحالات، الشحن، والتفاصيل بسرعة.</p>
+            </div>
+          </div>
+          <div class="dash-actions">
+            <button class="ghost sidebar-toggle" id="sidebarToggle" data-i18n="navToggle">
+              القائمة
+            </button>
+            <button class="ghost" id="ordersLangToggle">English</button>
+            <button class="ghost" id="exportOrders" data-i18n="exportExcel">تصدير Excel</button>
+            <a class="ghost" href="dashboard.html" data-i18n="backToDashboard">رجوع للوحة</a>
+            <a class="ghost" href="index.html" data-i18n="backToSite">رجوع للموقع</a>
+          </div>
+        </header>
+
+        <main class="dash-main">
+          <section class="dash-summary" id="summary">
+            <div id="summaryCards"></div>
+          </section>
+          <section class="dash-card" id="ordersSection">
+            <div class="dash-section-header">
+              <h2 data-i18n="ordersTitle">الطلبات</h2>
+              <div class="order-tools">
+                <button class="ghost" id="clearOrders" data-i18n="clearOrders">مسح كل الطلبات</button>
+              </div>
+            </div>
+            <div class="orders-summary" id="ordersSummary"></div>
+            <div class="table" id="ordersTable"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="orders.js"></script>
+  </body>
+</html>

@@ -1,0 +1,289 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dody Store | متجر العناية بالبشرة والمكياج</title>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav">
+        <div class="brand">
+          <img class="brand-logo" id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
+          <div class="brand-text">
+            <span class="brand-name" id="brandName">Dody Store</span>
+            <span class="brand-tag" id="brandTag">عناية ومكياج بإحساس عصري</span>
+          </div>
+        </div>
+        <div class="nav-links">
+          <a href="#collections" data-i18n="navBundles">الباقات</a>
+          <a href="#products" data-i18n="navProducts">المنتجات</a>
+          <a href="products.html" data-i18n="navAllProducts">كل المنتجات</a>
+          <a href="#routine" data-i18n="navRoutine">روتينك</a>
+          <a href="#about" data-i18n="navAbout">قصتنا</a>
+          <a href="#contact" data-i18n="navContact">تواصل</a>
+        </div>
+        <div class="nav-cta">
+          <button class="ghost lang-toggle" id="langToggle">English</button>
+          <button class="cart" id="cartButton">
+            <span data-i18n="cartBtn">السلة</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content">
+          <p class="eyebrow" id="heroEyebrow">اختيارات خبراء البشرة</p>
+          <h1 id="heroTitle">بشرة مرتاحة. مكياج ثابت. ثقة كل يوم.</h1>
+          <p class="hero-copy" id="heroCopy">
+            في Dody Store بنجمع بين التركيبات الفعّالة واللمسة الجمالية. منتجات مختارة،
+            أحجام واضحة، وأسعار مناسبة لكل روتين.
+          </p>
+          <div class="hero-actions">
+            <button class="primary" id="shopNow">تسوّقي الآن</button>
+            <button class="secondary" id="seeBundles">شاهدي الباقات</button>
+          </div>
+          <div class="hero-badges" id="heroBadges"></div>
+          <div class="delivery-note" id="deliveryNote"></div>
+        </div>
+        <div class="hero-visual">
+          <div class="glow"></div>
+          <div class="hero-card" id="featuredCard">
+            <img class="featured-image" id="featuredImage" src="" alt="" />
+            <p id="featuredName">باقة الدودي اليومية</p>
+            <h3 id="featuredDesc">5 منتجات أساسية لبشرة متوازنة</h3>
+            <div class="price-row">
+              <span class="price" id="featuredPrice">990 جنيه</span>
+              <button class="mini add-to-cart" id="featuredAdd">أضيفي للسلة</button>
+            </div>
+            <button class="ghost details-btn" id="featuredDetails" data-i18n="bundleDetails">
+              تفاصيل الباقة
+            </button>
+          </div>
+          <div class="hero-image">
+            <div class="orb"></div>
+            <div class="orb two"></div>
+            <div class="orb three"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="strip" id="stripList"></section>
+
+      <section id="collections" class="collections">
+        <div class="section-head">
+          <h2 id="collectionsTitle">باقات عملية لكل احتياج</h2>
+          <p id="collectionsDesc">اختاري باقة جاهزة ووفري وقتك مع خصم ثابت على المجموعة.</p>
+        </div>
+        <div class="collection-grid" id="collectionGrid"></div>
+      </section>
+
+      <section id="products" class="products">
+        <div class="section-head">
+          <h2 id="productsTitle">منتجات ببيانات واضحة</h2>
+          <p id="productsDesc">اختيارات بعناية مع تفاصيل الحجم والتركيز والأسعار.</p>
+        </div>
+        <div class="filter-tabs" id="filterTabs" role="tablist"></div>
+        <div class="product-grid" id="productGrid"></div>
+        <div class="section-cta">
+          <a class="secondary" href="products.html" id="viewAllProducts" data-i18n="viewAllProducts">
+            عرض كل المنتجات
+          </a>
+        </div>
+      </section>
+
+      <section class="ingredients">
+        <div class="section-head">
+          <h2 id="ingredientsTitle">مكونات فعّالة بتركيزات مناسبة</h2>
+          <p id="ingredientsDesc">نختار مكونات أساسية مدعومة بالبحوث للعناية اليومية.</p>
+        </div>
+        <div class="ingredient-grid" id="ingredientGrid"></div>
+      </section>
+
+      <section id="routine" class="routine">
+        <div class="routine-content">
+          <h2 data-i18n="routineTitle">ابني روتينك خلال دقيقة</h2>
+          <p data-i18n="routineDesc">اختاري نوع بشرتك، وسنقترح لك مجموعة منتجات مناسبة من المتجر.</p>
+          <div class="routine-options">
+            <button class="chip" data-skin="dry" data-i18n="skinDry">جافة</button>
+            <button class="chip" data-skin="oily" data-i18n="skinOily">دهنية</button>
+            <button class="chip" data-skin="combo" data-i18n="skinCombo">مختلطة</button>
+            <button class="chip" data-skin="sensitive" data-i18n="skinSensitive">حساسة</button>
+          </div>
+          <div class="routine-result" id="routineResult" data-i18n="routineHint">
+            اختاري نوع بشرتك لرؤية الاقتراحات.
+          </div>
+        </div>
+        <div class="routine-visual">
+          <div class="routine-card">
+            <h3 data-i18n="routineStepsTitle">الخطوات الأساسية</h3>
+            <ol>
+              <li data-i18n="step1">تنظيف لطيف</li>
+              <li data-i18n="step2">تونر موازن</li>
+              <li data-i18n="step3">سيروم مركز</li>
+              <li data-i18n="step4">كريم ترطيب</li>
+              <li data-i18n="step5">واقي شمس</li>
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      <section class="testimonials">
+        <div class="section-head">
+          <h2 id="testimonialsTitle">عملاؤنا قالوا</h2>
+          <p id="testimonialsDesc">آراء حقيقية من طلبات الشهر الحالي.</p>
+        </div>
+        <div class="testimonial-carousel">
+          <button class="carousel-btn" id="testimonialPrev" aria-label="Prev">‹</button>
+          <div class="testimonial-track" id="testimonialTrack"></div>
+          <button class="carousel-btn" id="testimonialNext" aria-label="Next">›</button>
+        </div>
+      </section>
+
+      <section id="about" class="about">
+        <div class="about-text">
+          <h2 id="aboutTitle">قصتنا مع الجمال الهادئ</h2>
+          <p id="aboutDesc">
+            Dody Store علامة عربية بدأت بشغف العناية الواقعية: منتجات واضحة، روتين بسيط،
+            وتجربة شراء مريحة بدون تعقيد. بنراجع كل منتج مع مختصين عشان نضمن نتائج تليق
+            ببشرتك.
+          </p>
+          <div class="stats" id="aboutStats"></div>
+        </div>
+        <div class="about-card">
+          <h3 id="aboutCardTitle">هدية أول طلب</h3>
+          <p id="aboutCardDesc">خذي عينة مجانية + كوبون خصم 10% لأول طلب لك.</p>
+          <button class="secondary" id="aboutCardBtn">احصلي عليها</button>
+        </div>
+      </section>
+
+      <section class="contact-cta" id="contact">
+        <div class="contact-card">
+          <h2 id="contactCtaTitle">اسألي خبيرة دودي على واتساب</h2>
+          <p id="contactCtaDesc">رسالة واحدة ونساعدك تختاري الروتين والمنتجات المناسبة لبشرتك.</p>
+          <a
+            class="primary"
+            id="contactCtaBtn"
+            href="#"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ابدئي المحادثة الآن
+          </a>
+          <p class="fine" id="contactCtaNote">رد سريع خلال ساعات العمل.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-grid">
+        <div>
+          <h3>Dody Store</h3>
+          <p id="footerDesc">متجر عناية بالبشرة ومكياج بتجربة عربية عصرية.</p>
+        </div>
+        <div>
+          <h4 data-i18n="footerServices">خدماتنا</h4>
+          <ul id="footerServicesList"></ul>
+        </div>
+        <div>
+          <h4 data-i18n="footerContact">التواصل</h4>
+          <ul>
+            <li id="footerWhatsapp">واتساب: 0112 345 6789</li>
+            <li id="footerInsta">إنستجرام: @dody.store</li>
+          </ul>
+        </div>
+        <div>
+          <h4 data-i18n="footerHours">ساعات العمل</h4>
+          <p id="footerHours">كل يوم من 10 صباحًا حتى 10 مساءً</p>
+        </div>
+      </div>
+      <p class="copyright" id="copyright" data-i18n="copyright">© 2026 Dody Store. كل الحقوق محفوظة.</p>
+    </footer>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="gift-modal" id="giftModal" aria-hidden="true">
+      <div class="gift-card">
+        <button class="icon-btn" id="giftClose" aria-label="Close">×</button>
+        <h3 id="giftTitle">هدية أول طلب</h3>
+        <p id="giftDesc">عينة مجانية + تغليف هدية لأول طلب.</p>
+        <div class="gift-actions">
+          <button class="primary" id="giftWhatsAppBtn" type="button">اطلبي الهدية على واتساب</button>
+          <button class="ghost" id="giftShopBtn" type="button">ابدئي الطلب</button>
+        </div>
+      </div>
+    </div>
+    <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+      <div class="cart-header">
+        <h3 data-i18n="cartTitle">سلتك</h3>
+        <button class="icon-btn" id="closeCart" aria-label="Close">×</button>
+      </div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary">
+        <span data-i18n="subtotal">الإجمالي</span>
+        <span id="cartTotal">0 جنيه</span>
+      </div>
+      <div class="cart-divider"></div>
+      <form id="orderForm" class="order-form">
+        <h4 data-i18n="orderTitle">بيانات الطلب</h4>
+        <div class="form-row">
+          <label for="customerName" data-i18n="nameLabel">الاسم الكامل</label>
+          <input
+            id="customerName"
+            type="text"
+            placeholder="اسمك بالكامل"
+            data-i18n-placeholder="namePlaceholder"
+            required
+          />
+        </div>
+        <div class="form-row">
+          <label for="customerPhone" data-i18n="phoneLabel">رقم الهاتف</label>
+          <input
+            id="customerPhone"
+            type="tel"
+            placeholder="رقم الهاتف"
+            data-i18n-placeholder="phonePlaceholder"
+            required
+          />
+        </div>
+        <div class="form-row">
+          <label for="customerAddress" data-i18n="addressLabel">العنوان بالكامل</label>
+          <input
+            id="customerAddress"
+            type="text"
+            placeholder="المنطقة - الشارع - رقم العمارة"
+            data-i18n-placeholder="addressPlaceholder"
+            required
+          />
+        </div>
+        <div class="form-row">
+          <label for="customerNotes" data-i18n="notesLabel">ملاحظات (اختياري)</label>
+          <textarea
+            id="customerNotes"
+            placeholder="أي ملاحظات للتوصيل"
+            data-i18n-placeholder="notesPlaceholder"
+          ></textarea>
+        </div>
+        <div class="form-row">
+          <label for="paymentMethod" data-i18n="paymentLabel">طريقة الدفع</label>
+          <input id="paymentMethod" type="text" readonly />
+        </div>
+        <button class="primary" type="submit" id="placeOrderBtn" data-i18n="placeOrder">
+          تأكيد الطلب
+        </button>
+        <p class="order-status" id="orderStatus" data-i18n="orderHint">
+          بعد التأكيد سيتم فتح واتساب لإرسال تفاصيل الطلب.
+        </p>
+      </form>
+    </aside>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="data.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>

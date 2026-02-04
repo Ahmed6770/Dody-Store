@@ -1,0 +1,509 @@
+﻿<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>لوحة التحكم | Dody Store</title>
+    <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="dashboard.css" />
+  </head>
+  <body class="dashboard">
+    <div class="admin-gate" id="adminGate" aria-hidden="true">
+      <div class="admin-card">
+        <h2 data-i18n="adminTitle">دخول لوحة التحكم</h2>
+        <p data-i18n="adminDesc">أدخل الرمز السري للوصول إلى لوحة الإدارة.</p>
+        <input
+          id="adminPinInput"
+          type="password"
+          placeholder="••••"
+          data-i18n-placeholder="adminPinPlaceholder"
+        />
+        <button class="primary" id="adminPinBtn" data-i18n="adminLogin">دخول</button>
+        <p class="admin-hint" id="adminPinHint" data-i18n="adminHint"></p>
+      </div>
+    </div>
+
+    <div class="dash-layout">
+      <aside class="dash-sidebar" id="dashSidebar">
+        <div class="dash-sidebar-head">
+          <div class="dash-brand">
+            <img src="assets/logo.svg" alt="Dody Store logo" />
+            <div>
+              <h2 data-i18n="dashTitle">لوحة تحكم Dody Store</h2>
+              <p data-i18n="dashSubtitle">إدارة المحتوى والطلبات بسهولة</p>
+            </div>
+          </div>
+        </div>
+        <nav class="dash-nav">
+          <a class="nav-link" href="#summary" data-i18n="navOverview">نظرة عامة</a>
+          <a class="nav-link" href="#general" data-i18n="navGeneral">الإعدادات العامة</a>
+          <a class="nav-link" href="#hero" data-i18n="navHero">الهيرو والباقات</a>
+          <a class="nav-link" href="#sections" data-i18n="navSections">عناوين الأقسام</a>
+          <a class="nav-link" href="#categories" data-i18n="navCategories">أنواع المنتجات</a>
+          <a class="nav-link" href="#collections" data-i18n="navCollections">الباقات الجاهزة</a>
+          <a class="nav-link" href="#products" data-i18n="navProducts">المنتجات</a>
+          <a class="nav-link" href="#ingredients" data-i18n="navIngredients">المكونات</a>
+          <a class="nav-link" href="#testimonials" data-i18n="navTestimonials">آراء العملاء</a>
+          <a class="nav-link" href="#about" data-i18n="navAbout">عن المتجر</a>
+          <a class="nav-link" href="#contactCta" data-i18n="navContactCta">تواصل واتساب</a>
+          <a class="nav-link nav-orders" href="orders.html" data-i18n="navOrders">الطلبات</a>
+        </nav>
+      </aside>
+      <div class="dash-overlay" id="sidebarOverlay"></div>
+      <div class="dash-content" id="top">
+        <header class="dash-header">
+          <div class="dash-brand">
+            <img src="assets/logo.svg" alt="Dody Store logo" />
+            <div>
+              <h1 data-i18n="dashTitle">لوحة تحكم Dody Store</h1>
+              <p data-i18n="dashSubtitle">إدارة المحتوى والطلبات بسهولة</p>
+            </div>
+          </div>
+          <div class="dash-actions">
+            <button class="ghost sidebar-toggle" id="sidebarToggle" data-i18n="navToggle">
+              القائمة
+            </button>
+            <button class="ghost" id="dashLangToggle">English</button>
+            <button class="ghost" id="exportData" data-i18n="exportData">تصدير Excel</button>
+            <label class="ghost file-btn">
+              <span data-i18n="importData">استيراد</span>
+              <input id="importData" type="file" accept="application/json" />
+            </label>
+            <a class="ghost" href="index.html" data-i18n="backToSite">رجوع للموقع</a>
+            <button class="ghost" id="logoutBtn" data-i18n="logout">تسجيل خروج</button>
+            <button class="primary" id="saveAll" data-i18n="saveAll">حفظ التغييرات</button>
+          </div>
+        </header>
+
+        <main class="dash-main">
+          <section class="dash-summary" id="summary">
+            <div id="summaryCards"></div>
+          </section>
+          <section class="dash-card" id="general">
+        <h2 data-i18n="generalSettings">الإعدادات العامة</h2>
+        <div class="form-grid">
+          <label class="field">
+            <span data-i18n="storeName">اسم المتجر</span>
+            <input id="brandNameInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="storeTagAr">وصف المتجر (عربي)</span>
+            <input id="brandTagArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="storeTagEn">وصف المتجر (إنجليزي)</span>
+            <input id="brandTagEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="whatsappDisplay">واتساب (عرض)</span>
+            <input id="whatsappDisplayInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="whatsappIntl">واتساب دولي (بدون +)</span>
+            <input id="whatsappIntlInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="instagramLabel">إنستجرام</span>
+            <input id="instagramInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="hoursAr">ساعات العمل (عربي)</span>
+            <input id="hoursArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="hoursEn">ساعات العمل (إنجليزي)</span>
+            <input id="hoursEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="deliveryTimeAr">وقت التوصيل (عربي)</span>
+            <input id="deliveryTimeArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="deliveryTimeEn">وقت التوصيل (إنجليزي)</span>
+            <input id="deliveryTimeEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="homeSamplesCount">عدد منتجات المعاينة بالرئيسية</span>
+            <input id="homeSamplesInput" type="number" min="1" />
+          </label>
+          <label class="field">
+            <span data-i18n="footerDescAr">وصف الفوتر (عربي)</span>
+            <input id="footerDescArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="footerDescEn">وصف الفوتر (إنجليزي)</span>
+            <input id="footerDescEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="adminPinLabel">رمز دخول اللوحة</span>
+            <input id="adminPinSetting" type="text" />
+          </label>
+        </div>
+        <div class="media-field">
+          <div>
+            <h3 data-i18n="logoTitle">شعار المتجر</h3>
+            <p class="muted" data-i18n="logoDesc">ارفع صورة الشعار وسيتم حفظها داخل المتصفح.</p>
+            <input id="brandLogoFile" type="file" accept="image/*" />
+          </div>
+          <img id="brandLogoPreview" class="image-preview" src="assets/logo.svg" alt="Logo preview" />
+        </div>
+        <div class="media-field">
+          <div>
+            <h3 data-i18n="faviconTitle">أيقونة المتصفح</h3>
+            <p class="muted" data-i18n="faviconDesc">ارفع أيقونة صغيرة تظهر في تبويب المتصفح.</p>
+            <input id="brandFaviconFile" type="file" accept="image/*" />
+          </div>
+          <img id="brandFaviconPreview" class="image-preview favicon-preview" src="assets/logo.svg" alt="Favicon preview" />
+        </div>
+        <div class="list-block">
+          <div class="dash-section-header">
+            <h3 data-i18n="homeSamplesTitle">منتجات الصفحة الرئيسية</h3>
+            <button class="secondary" id="addHomeSample" data-i18n="addHomeSample">
+              إضافة منتج
+            </button>
+          </div>
+          <div id="homeSamplesInputs" class="list-rows"></div>
+          <p class="muted" data-i18n="homeSamplesHint">
+            لو القائمة فاضية سيتم عرض أول المنتجات تلقائيًا.
+          </p>
+        </div>
+        <div class="list-block">
+          <h3 data-i18n="footerServicesTitle">خدمات الفوتر (3 عناصر)</h3>
+          <div id="servicesInputs" class="list-grid"></div>
+        </div>
+      </section>
+
+      <section class="dash-card" id="hero">
+        <h2 data-i18n="heroSectionTitle">الهيرو والباقات</h2>
+        <div class="form-grid">
+          <label class="field">
+            <span data-i18n="heroEyebrowAr">عنوان صغير (عربي)</span>
+            <input id="heroEyebrowArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="heroEyebrowEn">عنوان صغير (إنجليزي)</span>
+            <input id="heroEyebrowEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="heroTitleAr">عنوان الهيرو (عربي)</span>
+            <input id="heroTitleArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="heroTitleEn">عنوان الهيرو (إنجليزي)</span>
+            <input id="heroTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="heroDescAr">وصف الهيرو (عربي)</span>
+            <textarea id="heroCopyArInput"></textarea>
+          </label>
+          <label class="field full">
+            <span data-i18n="heroDescEn">وصف الهيرو (إنجليزي)</span>
+            <textarea id="heroCopyEnInput"></textarea>
+          </label>
+          <label class="field">
+            <span data-i18n="heroPrimaryAr">زر رئيسي (عربي)</span>
+            <input id="heroPrimaryArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="heroPrimaryEn">زر رئيسي (إنجليزي)</span>
+            <input id="heroPrimaryEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="heroSecondaryAr">زر ثانوي (عربي)</span>
+            <input id="heroSecondaryArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="heroSecondaryEn">زر ثانوي (إنجليزي)</span>
+            <input id="heroSecondaryEnInput" type="text" />
+          </label>
+        </div>
+        <div class="list-block">
+          <h3 data-i18n="heroBadgesTitle">شريط المميزات (3 عناصر)</h3>
+          <div id="heroBadgesInputs" class="list-grid"></div>
+        </div>
+        <div class="list-block">
+          <h3 data-i18n="stripTitle">شريط الأرقام (4 عناصر)</h3>
+          <div id="stripInputs" class="list-grid"></div>
+        </div>
+        <div class="list-block">
+          <h3 data-i18n="featuredTitle">المجموعة المميزة</h3>
+          <div class="form-grid">
+            <label class="field">
+              <span data-i18n="featuredNameAr">اسم (عربي)</span>
+              <input id="featuredNameArInput" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="featuredNameEn">اسم (إنجليزي)</span>
+              <input id="featuredNameEnInput" type="text" />
+            </label>
+            <label class="field full">
+              <span data-i18n="featuredDescAr">وصف (عربي)</span>
+              <input id="featuredDescArInput" type="text" />
+            </label>
+            <label class="field full">
+              <span data-i18n="featuredDescEn">وصف (إنجليزي)</span>
+              <input id="featuredDescEnInput" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="featuredPrice">السعر</span>
+              <input id="featuredPriceInput" type="number" min="0" />
+            </label>
+            <label class="field">
+              <span data-i18n="featuredImagePath">صورة (مسار اختياري)</span>
+              <input id="featuredImageInput" type="text" />
+            </label>
+          </div>
+          <div class="media-field">
+            <div>
+              <h3 data-i18n="featuredImageTitle">صورة المجموعة المميزة</h3>
+              <p class="muted" data-i18n="featuredImageDesc">اختاري صورة من جهازك بدل كتابة المسار.</p>
+              <input id="featuredImageFile" type="file" accept="image/*" />
+            </div>
+            <img id="featuredImagePreview" class="image-preview" src="assets/products/bundle.svg" alt="Featured preview" />
+          </div>
+        </div>
+        <div class="list-block">
+          <div class="dash-section-header">
+            <h3 data-i18n="featuredItemsTitle">مكونات باقة الدودي اليومية</h3>
+            <button class="secondary" id="addFeaturedItem" data-i18n="addFeaturedItem">
+              إضافة منتج
+            </button>
+          </div>
+          <div id="featuredItemsInputs" class="list-rows"></div>
+        </div>
+      </section>
+
+      <section class="dash-card" id="sections">
+        <h2 data-i18n="sectionsTitle">عناوين الأقسام</h2>
+        <div class="form-grid">
+          <label class="field">
+            <span data-i18n="collectionsTitleAr">عنوان الباقات (عربي)</span>
+            <input id="collectionsTitleArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="collectionsTitleEn">عنوان الباقات (إنجليزي)</span>
+            <input id="collectionsTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="collectionsDescAr">وصف الباقات (عربي)</span>
+            <input id="collectionsDescArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="collectionsDescEn">وصف الباقات (إنجليزي)</span>
+            <input id="collectionsDescEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="productsTitleAr">عنوان المنتجات (عربي)</span>
+            <input id="productsTitleArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="productsTitleEn">عنوان المنتجات (إنجليزي)</span>
+            <input id="productsTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="productsDescAr">وصف المنتجات (عربي)</span>
+            <input id="productsDescArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="productsDescEn">وصف المنتجات (إنجليزي)</span>
+            <input id="productsDescEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="ingredientsTitleAr">عنوان المكونات (عربي)</span>
+            <input id="ingredientsTitleArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="ingredientsTitleEn">عنوان المكونات (إنجليزي)</span>
+            <input id="ingredientsTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="ingredientsDescAr">وصف المكونات (عربي)</span>
+            <input id="ingredientsDescArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="ingredientsDescEn">وصف المكونات (إنجليزي)</span>
+            <input id="ingredientsDescEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="testimonialsTitleAr">عنوان التقييمات (عربي)</span>
+            <input id="testimonialsTitleArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="testimonialsTitleEn">عنوان التقييمات (إنجليزي)</span>
+            <input id="testimonialsTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="testimonialsDescAr">وصف التقييمات (عربي)</span>
+            <input id="testimonialsDescArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="testimonialsDescEn">وصف التقييمات (إنجليزي)</span>
+            <input id="testimonialsDescEnInput" type="text" />
+          </label>
+        </div>
+      </section>
+
+      <section class="dash-card" id="categories">
+        <div class="dash-section-header">
+          <h2 data-i18n="categoriesTitle">أنواع المنتجات</h2>
+          <button class="secondary" id="addCategory" data-i18n="addCategory">إضافة نوع</button>
+        </div>
+        <div id="categoriesInputs" class="list-rows"></div>
+      </section>
+
+      <section class="dash-card" id="collections">
+        <div class="dash-section-header">
+          <h2 data-i18n="collectionsSectionTitle">الباقات الجاهزة</h2>
+          <button class="secondary" id="addCollection" data-i18n="addCollection">إضافة باقة</button>
+        </div>
+        <div id="collectionsInputs" class="list-rows"></div>
+      </section>
+
+      <section class="dash-card" id="products">
+        <div class="dash-section-header">
+          <h2 data-i18n="productsSectionTitle">المنتجات</h2>
+          <button class="secondary" id="addProduct" data-i18n="addProduct">إضافة منتج</button>
+        </div>
+        <div id="productsInputs" class="list-rows"></div>
+      </section>
+
+      <section class="dash-card" id="ingredients">
+        <div class="dash-section-header">
+          <h2 data-i18n="ingredientsSectionTitle">المكونات</h2>
+          <button class="secondary" id="addIngredient" data-i18n="addIngredient">إضافة مكون</button>
+        </div>
+        <div id="ingredientsInputs" class="list-rows"></div>
+      </section>
+
+      <section class="dash-card" id="testimonials">
+        <div class="dash-section-header">
+          <h2 data-i18n="testimonialsSectionTitle">آراء العملاء</h2>
+          <button class="secondary" id="addTestimonial" data-i18n="addTestimonial">إضافة رأي</button>
+        </div>
+        <div id="testimonialsInputs" class="list-rows"></div>
+      </section>
+
+      <section class="dash-card" id="about">
+        <h2 data-i18n="aboutSectionTitle">قسم عن المتجر</h2>
+        <div class="form-grid">
+          <label class="field full">
+            <span data-i18n="aboutTitleAr">العنوان (عربي)</span>
+            <input id="aboutTitleArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="aboutTitleEn">العنوان (إنجليزي)</span>
+            <input id="aboutTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="aboutDescAr">الوصف (عربي)</span>
+            <textarea id="aboutDescArInput"></textarea>
+          </label>
+          <label class="field full">
+            <span data-i18n="aboutDescEn">الوصف (إنجليزي)</span>
+            <textarea id="aboutDescEnInput"></textarea>
+          </label>
+        </div>
+        <div class="list-block">
+          <div class="dash-section-header">
+            <h3 data-i18n="statsTitle">الأرقام</h3>
+            <button class="secondary" id="addStat" data-i18n="addStat">إضافة رقم</button>
+          </div>
+          <div id="statsInputs" class="list-rows"></div>
+        </div>
+        <div class="list-block">
+          <h3 data-i18n="aboutCardTitle">كارت العرض</h3>
+          <div class="form-grid">
+            <label class="field">
+              <span data-i18n="aboutCardTitleAr">العنوان (عربي)</span>
+              <input id="aboutCardTitleArInput" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="aboutCardTitleEn">العنوان (إنجليزي)</span>
+              <input id="aboutCardTitleEnInput" type="text" />
+            </label>
+            <label class="field full">
+              <span data-i18n="aboutCardDescAr">الوصف (عربي)</span>
+              <input id="aboutCardDescArInput" type="text" />
+            </label>
+            <label class="field full">
+              <span data-i18n="aboutCardDescEn">الوصف (إنجليزي)</span>
+              <input id="aboutCardDescEnInput" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="aboutCardBtnAr">زر الكارت (عربي)</span>
+              <input id="aboutCardBtnArInput" type="text" />
+            </label>
+            <label class="field">
+              <span data-i18n="aboutCardBtnEn">زر الكارت (إنجليزي)</span>
+              <input id="aboutCardBtnEnInput" type="text" />
+            </label>
+            <label class="field full">
+              <span data-i18n="aboutCardMessageAr">رسالة واتساب (عربي)</span>
+              <textarea id="aboutCardMessageArInput"></textarea>
+            </label>
+            <label class="field full">
+              <span data-i18n="aboutCardMessageEn">رسالة واتساب (إنجليزي)</span>
+              <textarea id="aboutCardMessageEnInput"></textarea>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <section class="dash-card" id="contactCta">
+        <h2 data-i18n="contactCtaSectionTitle">دعوة واتساب</h2>
+        <div class="form-grid">
+          <label class="field full">
+            <span data-i18n="contactCtaTitleAr">عنوان الدعوة (عربي)</span>
+            <input id="contactCtaTitleArInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="contactCtaTitleEn">عنوان الدعوة (إنجليزي)</span>
+            <input id="contactCtaTitleEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="contactCtaDescAr">وصف الدعوة (عربي)</span>
+            <textarea id="contactCtaDescArInput"></textarea>
+          </label>
+          <label class="field full">
+            <span data-i18n="contactCtaDescEn">وصف الدعوة (إنجليزي)</span>
+            <textarea id="contactCtaDescEnInput"></textarea>
+          </label>
+          <label class="field">
+            <span data-i18n="contactCtaButtonAr">زر الدعوة (عربي)</span>
+            <input id="contactCtaButtonArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="contactCtaButtonEn">زر الدعوة (إنجليزي)</span>
+            <input id="contactCtaButtonEnInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="contactCtaNoteAr">ملاحظة أسفل الزر (عربي)</span>
+            <input id="contactCtaNoteArInput" type="text" />
+          </label>
+          <label class="field">
+            <span data-i18n="contactCtaNoteEn">ملاحظة أسفل الزر (إنجليزي)</span>
+            <input id="contactCtaNoteEnInput" type="text" />
+          </label>
+          <label class="field full">
+            <span data-i18n="contactCtaMessageAr">رسالة واتساب الجاهزة (عربي)</span>
+            <textarea id="contactCtaMessageArInput"></textarea>
+          </label>
+          <label class="field full">
+            <span data-i18n="contactCtaMessageEn">رسالة واتساب الجاهزة (إنجليزي)</span>
+            <textarea id="contactCtaMessageEnInput"></textarea>
+          </label>
+        </div>
+      </section>
+
+          <p class="save-note" id="saveNote" data-i18n="saveNote">لم يتم الحفظ بعد.</p>
+        </main>
+      </div>
+    </div>
+
+    <button class="back-to-top" id="backToTop" aria-label="Top">↑</button>
+
+    <script src="data.js"></script>
+    <script src="dashboard.js"></script>
+  </body>
+</html>
