@@ -1,4 +1,4 @@
-﻿const adminGate = document.getElementById("adminGate");
+﻿?const adminGate = document.getElementById("adminGate");
 const adminEmailInput = document.getElementById("adminEmailInput");
 const adminPasswordInput = document.getElementById("adminPasswordInput");
 const adminLoginBtn = document.getElementById("adminLoginBtn");
@@ -20,74 +20,74 @@ let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 
 const i18n = {
   ar: {
-    adminTitle: "Ø¯Ø®ÙˆÙ„ Ù„ÙˆØ­Ø© Ø§Ù„ØªØ­ÙƒÙ…",
-    adminDesc: "سجّل الدخول بحساب الإدارة",
-    adminLogin: "Ø¯Ø®ÙˆÙ„",
-    adminHint: "تأكد من البريد وكلمة المرور",
-    adminPinError: "Ø§Ù„Ø±Ù…Ø² ØºÙŠØ± ØµØ­ÙŠØ­.",
-    adminPinPlaceholder: "â€¢â€¢â€¢â€¢",
-    adminLoginError: "بيانات الدخول غير صحيحة.",
-    adminEmailPlaceholder: "البريد الإلكتروني",
-    adminPasswordPlaceholder: "كلمة المرور",
-    dashTitle: "Ù„ÙˆØ­Ø© ØªØ­ÙƒÙ… Dody Store",
-    dashSubtitle: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ù…Ø­ØªÙˆÙ‰ ÙˆØ§Ù„Ø·Ù„Ø¨Ø§Øª Ø¨Ø³Ù‡ÙˆÙ„Ø©",
-    navOverview: "Ù†Ø¸Ø±Ø© Ø¹Ø§Ù…Ø©",
-    navGeneral: "Ø§Ù„Ø¥Ø¹Ø¯Ø§Ø¯Ø§Øª Ø§Ù„Ø¹Ø§Ù…Ø©",
-    navHero: "Ø§Ù„Ù‡ÙŠØ±Ùˆ ÙˆØ§Ù„Ø¨Ø§Ù‚Ø§Øª",
-    navSections: "Ø¹Ù†Ø§ÙˆÙŠÙ† Ø§Ù„Ø£Ù‚Ø³Ø§Ù…",
-    navCategories: "Ø£Ù†ÙˆØ§Ø¹ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
-    navCollections: "Ø§Ù„Ø¨Ø§Ù‚Ø§Øª Ø§Ù„Ø¬Ø§Ù‡Ø²Ø©",
-    navProducts: "Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
-    navIngredients: "Ø§Ù„Ù…ÙƒÙˆÙ†Ø§Øª",
-    navTestimonials: "Ø¢Ø±Ø§Ø¡ Ø§Ù„Ø¹Ù…Ù„Ø§Ø¡",
-    navAbout: "Ø¹Ù† Ø§Ù„Ù…ØªØ¬Ø±",
-    navContactCta: "ØªÙˆØ§ØµÙ„ ÙˆØ§ØªØ³Ø§Ø¨",
-    navOrders: "Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    navToggle: "Ø§Ù„Ù‚Ø§Ø¦Ù…Ø©",
-    ordersPageTitle: "Ø¥Ø¯Ø§Ø±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    ordersPageSubtitle: "ØªØ§Ø¨Ø¹ÙŠ Ø§Ù„Ø­Ø§Ù„Ø§ØªØŒ Ø§Ù„Ø´Ø­Ù†ØŒ ÙˆØ§Ù„ØªÙØ§ØµÙŠÙ„ Ø¨Ø³Ø±Ø¹Ø©.",
-    exportExcel: "ØªØµØ¯ÙŠØ± Excel",
-    backToDashboard: "Ø±Ø¬ÙˆØ¹ Ù„Ù„ÙˆØ­Ø©",
-    backToSite: "Ø±Ø¬ÙˆØ¹ Ù„Ù„Ù…ÙˆÙ‚Ø¹",
-    ordersTitle: "Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    clearOrders: "Ù…Ø³Ø­ ÙƒÙ„ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    summaryOrders: "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    summaryNew: "Ø·Ù„Ø¨Ø§Øª Ø¬Ø¯ÙŠØ¯Ø©",
-    summaryProcessing: "Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°",
-    summaryRevenue: "Ø¥Ø¬Ù…Ø§Ù„ÙŠ Ø§Ù„Ù…Ø¨ÙŠØ¹Ø§Øª",
-    summaryCancelled: "Ù…Ù„ØºØ§Ø©",
-    ordersSummary: "Ø¹Ø¯Ø¯ Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    ordersSummaryNew: "Ø¬Ø¯ÙŠØ¯Ø©",
-    ordersSummaryCancelled: "Ù…Ù„ØºØ§Ø©",
-    ordersSummaryFiltered: "Ø§Ù„Ù…Ø¹Ø±ÙˆØ¶",
-    ordersFilterLabel: "ÙÙ„ØªØ±Ø© Ø§Ù„Ø·Ù„Ø¨Ø§Øª",
-    ordersSearchLabel: "Ø¨Ø­Ø«",
-    ordersSearchPlaceholder: "Ø§Ø³Ù… / Ø±Ù‚Ù… / Ù‡Ø§ØªÙ",
-    filterAll: "Ø§Ù„ÙƒÙ„",
-    ordersHeaderCustomer: "Ø§Ù„Ø¹Ù…ÙŠÙ„",
-    ordersHeaderId: "Ø±Ù‚Ù… Ø§Ù„Ø·Ù„Ø¨",
-    ordersHeaderDate: "Ø§Ù„ØªØ§Ø±ÙŠØ®",
-    ordersHeaderTotals: "Ø§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª",
-    ordersHeaderStatus: "Ø§Ù„Ø­Ø§Ù„Ø©",
-    ordersHeaderActions: "Ø§Ù„Ø¥Ø¬Ø±Ø§Ø¡Ø§Øª",
-    ordersHeaderShipping: "Ø§Ù„Ø´Ø­Ù†",
-    ordersHeaderItems: "Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª",
-    ordersTotalLabel: "Ø§Ù„Ø¥Ø¬Ù…Ø§Ù„ÙŠ",
-    ordersDeliveryLabel: "Ø§Ù„ØªÙˆØµÙŠÙ„",
-    ordersNetLabel: "Ø§Ù„ØµØ§ÙÙŠ",
-    statusNew: "Ø¬Ø¯ÙŠØ¯",
-    statusProcessing: "Ù‚ÙŠØ¯ Ø§Ù„ØªÙ†ÙÙŠØ°",
-    statusDone: "ØªÙ… Ø§Ù„ØªØ³Ù„ÙŠÙ…",
-    statusCancelled: "Ù…Ù„ØºÙŠ",
-    shippingPending: "Ù„Ù… ÙŠØªÙ… Ø§Ù„Ø´Ø­Ù†",
-    shippingShipped: "ØªÙ… Ø§Ù„Ø´Ø­Ù†",
-    viewDetails: "ØªÙØ§ØµÙŠÙ„",
-    whatsappAction: "ÙˆØ§ØªØ³Ø§Ø¨",
-    removeOrder: "Ø­Ø°Ù",
-    confirmRemoveOrder: "Ù‡Ù„ ØªØ±ÙŠØ¯ Ø­Ø°Ù Ø§Ù„Ø·Ù„Ø¨ØŸ",
-    noOrders: "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø·Ù„Ø¨Ø§Øª Ø­ØªÙ‰ Ø§Ù„Ø¢Ù†.",
-    confirmClearOrders: "Ù‡Ù„ ØªØ±ÙŠØ¯ Ù…Ø³Ø­ ÙƒÙ„ Ø§Ù„Ø·Ù„Ø¨Ø§ØªØŸ",
-    exportEmpty: "Ù„Ø§ ÙŠÙˆØ¬Ø¯ Ø¨ÙŠØ§Ù†Ø§Øª Ù„ØªØµØ¯ÙŠØ±Ù‡Ø§."
+    adminTitle: "دخ�^�" �"�^حة ا�"تح�f�.",
+    adminDesc: "???? ?????? ????? ???????",
+    adminLogin: "دخ�^�"",
+    adminHint: "???? ?? ?????? ????? ??????",
+    adminPinError: "ا�"ر�.ز غ�Sر صح�Sح.",
+    adminPinPlaceholder: "�?��?��?��?�",
+    adminLoginError: "?????? ?????? ??? ?????.",
+    adminEmailPlaceholder: "?????? ??????????",
+    adminPasswordPlaceholder: "???? ??????",
+    dashTitle: "�"�^حة تح�f�. Dody Store",
+    dashSubtitle: "إدارة ا�"�.حت�^�? �^ا�"ط�"بات بس�?�^�"ة",
+    navOverview: "�?ظرة عا�.ة",
+    navGeneral: "ا�"إعدادات ا�"عا�.ة",
+    navHero: "ا�"�?�Sر�^ �^ا�"با�,ات",
+    navSections: "ع�?ا�^�S�? ا�"أ�,سا�.",
+    navCategories: "أ�?�^اع ا�"�.�?تجات",
+    navCollections: "ا�"با�,ات ا�"جا�?زة",
+    navProducts: "ا�"�.�?تجات",
+    navIngredients: "ا�"�.�f�^�?ات",
+    navTestimonials: "آراء ا�"ع�.�"اء",
+    navAbout: "ع�? ا�"�.تجر",
+    navContactCta: "ت�^اص�" �^اتساب",
+    navOrders: "ا�"ط�"بات",
+    navToggle: "ا�"�,ائ�.ة",
+    ordersPageTitle: "إدارة ا�"ط�"بات",
+    ordersPageSubtitle: "تابع�S ا�"حا�"ات�O ا�"شح�?�O �^ا�"تفاص�S�" بسرعة.",
+    exportExcel: "تصد�Sر Excel",
+    backToDashboard: "رج�^ع �"�"�^حة",
+    backToSite: "رج�^ع �"�"�.�^�,ع",
+    ordersTitle: "ا�"ط�"بات",
+    clearOrders: "�.سح �f�" ا�"ط�"بات",
+    summaryOrders: "إج�.ا�"�S ا�"ط�"بات",
+    summaryNew: "ط�"بات جد�Sدة",
+    summaryProcessing: "�,�Sد ا�"ت�?ف�Sذ",
+    summaryRevenue: "إج�.ا�"�S ا�"�.ب�Sعات",
+    summaryCancelled: "�.�"غاة",
+    ordersSummary: "عدد ا�"ط�"بات",
+    ordersSummaryNew: "جد�Sدة",
+    ordersSummaryCancelled: "�.�"غاة",
+    ordersSummaryFiltered: "ا�"�.عر�^ض",
+    ordersFilterLabel: "ف�"ترة ا�"ط�"بات",
+    ordersSearchLabel: "بحث",
+    ordersSearchPlaceholder: "اس�. / ر�,�. / �?اتف",
+    filterAll: "ا�"�f�"",
+    ordersHeaderCustomer: "ا�"ع�.�S�"",
+    ordersHeaderId: "ر�,�. ا�"ط�"ب",
+    ordersHeaderDate: "ا�"تار�Sخ",
+    ordersHeaderTotals: "ا�"�.دف�^عات",
+    ordersHeaderStatus: "ا�"حا�"ة",
+    ordersHeaderActions: "ا�"إجراءات",
+    ordersHeaderShipping: "ا�"شح�?",
+    ordersHeaderItems: "ا�"�.�?تجات",
+    ordersTotalLabel: "ا�"إج�.ا�"�S",
+    ordersDeliveryLabel: "ا�"ت�^ص�S�"",
+    ordersNetLabel: "ا�"صاف�S",
+    statusNew: "جد�Sد",
+    statusProcessing: "�,�Sد ا�"ت�?ف�Sذ",
+    statusDone: "ت�. ا�"تس�"�S�.",
+    statusCancelled: "�.�"غ�S",
+    shippingPending: "�"�. �Sت�. ا�"شح�?",
+    shippingShipped: "ت�. ا�"شح�?",
+    viewDetails: "تفاص�S�"",
+    whatsappAction: "�^اتساب",
+    removeOrder: "حذف",
+    confirmRemoveOrder: "�?�" تر�Sد حذف ا�"ط�"ب�Y",
+    noOrders: "�"ا �S�^جد ط�"بات حت�? ا�"آ�?.",
+    confirmClearOrders: "�?�" تر�Sد �.سح �f�" ا�"ط�"بات�Y",
+    exportEmpty: "�"ا �S�^جد ب�Sا�?ات �"تصد�Sر�?ا."
   },
   en: {
     adminTitle: "Admin Access",
@@ -95,7 +95,7 @@ const i18n = {
     adminLogin: "Login",
     adminHint: "Check your email and password.",
     adminPinError: "Incorrect PIN.",
-    adminPinPlaceholder: "â€¢â€¢â€¢â€¢",
+    adminPinPlaceholder: "�?��?��?��?�",
     adminLoginError: "Incorrect login details.",
     adminEmailPlaceholder: "Email address",
     adminPasswordPlaceholder: "Password",
@@ -163,7 +163,7 @@ const i18n = {
 
 const t = (key) => i18n[dashLang]?.[key] || key;
 const getLocale = () => (dashLang === "ar" ? "ar-EG" : "en-US");
-const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "Ø¬Ù†ÙŠÙ‡" : "EGP"}`;
+const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "ج�?�S�?" : "EGP"}`;
 
 const defaultData = window.DODY_DEFAULT_DATA || {};
 const deepClone = (data) => JSON.parse(JSON.stringify(data));
@@ -301,7 +301,7 @@ const applyLang = () => {
   });
 
   if (ordersLangToggle) {
-    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "Ø¹Ø±Ø¨ÙŠ";
+    ordersLangToggle.textContent = dashLang === "ar" ? "English" : "عرب�S";
   }
 
   document.title = `${t("ordersPageTitle")} | Dody Store`;
@@ -357,7 +357,7 @@ const buildOrdersRow = (order) => {
 
   const waMessage =
     dashLang === "ar"
-      ? `Ù…Ø±Ø­Ø¨Ø§Ù‹ ${order.name}ØŒ Ø¨Ù†Ø£ÙƒØ¯ Ø·Ù„Ø¨Ùƒ Ø±Ù‚Ù… ${order.id}.`
+      ? `�.رحبا�< ${order.name}�O ب�?أ�fد ط�"ب�f ر�,�. ${order.id}.`
       : `Hi ${order.name}, we're confirming your order #${order.id}.`;
   const waLink = `https://wa.me/${formatPhone(order.phone)}?text=${encodeURIComponent(
     waMessage
@@ -723,3 +723,4 @@ const init = async () => {
 };
 
 init();
+
