@@ -244,6 +244,8 @@ const renderProducts = () => {
       img.className = "product-image";
       img.src = product.image || "assets/products/bundle.svg";
       img.alt = product.name?.[currentLang] || "Product";
+      img.loading = "lazy";
+      img.decoding = "async";
 
       const meta = document.createElement("div");
       meta.className = "product-meta";
@@ -275,6 +277,13 @@ const renderProducts = () => {
       const price = document.createElement("span");
       price.className = "price";
       price.textContent = formatCurrency(product.price || 0, currentLang);
+
+      if (product.showComparePrice && Number(product.comparePrice) > Number(product.price || 0)) {
+        const compare = document.createElement("span");
+        compare.className = "compare-price";
+        compare.textContent = formatCurrency(product.comparePrice || 0, currentLang);
+        priceRow.appendChild(compare);
+      }
 
       const button = document.createElement("button");
       button.className = "mini add-to-cart";

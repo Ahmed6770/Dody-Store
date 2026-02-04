@@ -118,6 +118,7 @@ const productImage = document.getElementById("productImage");
 const productName = document.getElementById("productName");
 const productDesc = document.getElementById("productDesc");
 const productPrice = document.getElementById("productPrice");
+const productComparePrice = document.getElementById("productComparePrice");
 const productTag = document.getElementById("productTag");
 const productStatus = document.getElementById("productStatus");
 const productDelivery = document.getElementById("productDelivery");
@@ -211,9 +212,19 @@ const renderProduct = () => {
 
   productImage.src = product.image || "assets/products/bundle.svg";
   productImage.alt = product.name?.[currentLang] || "Product";
+  productImage.loading = "eager";
+  productImage.decoding = "async";
   productName.textContent = product.name?.[currentLang] || "";
   productDesc.textContent = product.desc?.[currentLang] || "";
   productPrice.textContent = formatCurrency(product.price || 0, currentLang);
+  if (productComparePrice) {
+    const compareOk =
+      product.showComparePrice && Number(product.comparePrice) > Number(product.price || 0);
+    productComparePrice.textContent = compareOk
+      ? formatCurrency(product.comparePrice || 0, currentLang)
+      : "";
+    productComparePrice.hidden = !compareOk;
+  }
 
   if (productTag) {
     productTag.textContent = product.tag || "";

@@ -258,10 +258,7 @@
               <span data-i18n="featuredPrice">السعر</span>
               <input id="featuredPriceInput" type="number" min="0" />
             </label>
-            <label class="field">
-              <span data-i18n="featuredImagePath">صورة (مسار اختياري)</span>
-              <input id="featuredImageInput" type="text" />
-            </label>
+            <input id="featuredImageInput" type="hidden" />
           </div>
           <div class="media-field">
             <div>
@@ -372,7 +369,21 @@
       <section class="dash-card" id="products">
         <div class="dash-section-header">
           <h2 data-i18n="productsSectionTitle">المنتجات</h2>
-          <button class="secondary" id="addProduct" data-i18n="addProduct">إضافة منتج</button>
+          <div class="order-tools">
+            <select id="productsStatusFilter">
+              <option value="all" data-i18n="filterAll">الكل</option>
+              <option value="active" data-i18n="filterActive">نشط</option>
+              <option value="inactive" data-i18n="filterInactive">غير نشط</option>
+              <option value="unavailable" data-i18n="filterUnavailable">غير متاح</option>
+            </select>
+            <input
+              id="productsSearchInput"
+              type="search"
+              placeholder="بحث بالاسم أو الكود"
+              data-i18n-placeholder="productsSearchPlaceholder"
+            />
+            <button class="secondary" id="addProduct" data-i18n="addProduct">إضافة منتج</button>
+          </div>
         </div>
         <div id="productsInputs" class="list-rows"></div>
       </section>

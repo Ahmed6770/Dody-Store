@@ -429,6 +429,8 @@ const renderProducts = () => {
     img.className = "product-image";
     img.src = product.image || "assets/products/bundle.svg";
     img.alt = product.name?.[currentLang] || "Product";
+    img.loading = "lazy";
+    img.decoding = "async";
 
     const meta = document.createElement("div");
     meta.className = "product-meta";
@@ -462,6 +464,13 @@ const renderProducts = () => {
     const price = document.createElement("span");
     price.className = "price";
     price.textContent = formatCurrency(product.price || 0);
+
+    if (product.showComparePrice && Number(product.comparePrice) > Number(product.price || 0)) {
+      const compare = document.createElement("span");
+      compare.className = "compare-price";
+      compare.textContent = formatCurrency(product.comparePrice);
+      priceRow.appendChild(compare);
+    }
 
     const button = document.createElement("button");
     button.className = "mini add-to-cart";
@@ -580,6 +589,8 @@ const renderTestimonials = () => {
       const img = document.createElement("img");
       img.src = testimonial.image;
       img.alt = testimonial.name?.[currentLang] || "Customer message";
+      img.loading = "lazy";
+      img.decoding = "async";
       article.appendChild(img);
     }
 
@@ -741,6 +752,8 @@ const renderFeatured = () => {
 
   featuredImage.src = featured.image || "assets/products/bundle.svg";
   featuredImage.alt = featured.name?.[currentLang] || "";
+  featuredImage.loading = "eager";
+  featuredImage.decoding = "async";
   featuredName.textContent = featured.name?.[currentLang] || "";
   featuredDesc.textContent = featured.desc?.[currentLang] || "";
   featuredPrice.textContent = formatCurrency(featured.price || 0);

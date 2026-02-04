@@ -45,6 +45,9 @@ const loadStoreData = async () => {
 
 let storeData = deepClone(defaultData);
 let ordersPoll = null;
+let draggingProductRow = null;
+let productStatusFilter = "all";
+let productSearchTerm = "";
 
 let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 const dashI18n = {
@@ -72,6 +75,16 @@ const dashI18n = {
     navOrders: "الطلبات",
     exportData: "تصدير Excel",
     exportEmpty: "لا يوجد بيانات لتصديرها.",
+    dragLabel: "سحب",
+    dragHint: "اسحب لترتيب المنتجات",
+    filterAll: "الكل",
+    filterActive: "نشط",
+    filterInactive: "غير نشط",
+    filterUnavailable: "غير متاح",
+    productsSearchPlaceholder: "بحث بالاسم أو الكود",
+    previewProduct: "معاينة",
+    comparePriceLabel: "سعر قبل الخصم",
+    comparePriceToggle: "تفعيل سعر قبل الخصم",
     importData: "استيراد",
     backToSite: "رجوع للموقع",
     logout: "تسجيل خروج",
@@ -283,6 +296,16 @@ const dashI18n = {
     navOrders: "Orders",
     exportData: "Export Excel",
     exportEmpty: "No data to export.",
+    dragLabel: "Drag",
+    dragHint: "Drag to reorder products",
+    filterAll: "All",
+    filterActive: "Active",
+    filterInactive: "Inactive",
+    filterUnavailable: "Unavailable",
+    productsSearchPlaceholder: "Search by name or ID",
+    previewProduct: "Preview",
+    comparePriceLabel: "Compare-at price",
+    comparePriceToggle: "Enable compare price",
     importData: "Import",
     backToSite: "Back to site",
     logout: "Logout",
@@ -502,6 +525,8 @@ const servicesInputs = document.getElementById("servicesInputs");
 const categoriesInputs = document.getElementById("categoriesInputs");
 const collectionsInputs = document.getElementById("collectionsInputs");
 const productsInputs = document.getElementById("productsInputs");
+const productsStatusFilter = document.getElementById("productsStatusFilter");
+const productsSearchInput = document.getElementById("productsSearchInput");
 const ingredientsInputs = document.getElementById("ingredientsInputs");
 const testimonialsInputs = document.getElementById("testimonialsInputs");
 const statsInputs = document.getElementById("statsInputs");
@@ -884,6 +909,34 @@ const refreshProductOptions = () => {
   refreshSelects(homeSamplesInputs);
 };
 
+const applyProductFilters = () => {
+  if (!productsInputs) {
+    return;
+  }
+  const term = productSearchTerm.toLowerCase();
+  productsInputs.querySelectorAll("[data-type='product']").forEach((row) => {
+    const id = row.querySelector("[data-field='id']")?.value.trim() || "";
+    const nameAr = row.querySelector("[data-field='name.ar']")?.value.trim() || "";
+    const nameEn = row.querySelector("[data-field='name.en']")?.value.trim() || "";
+    const tag = row.querySelector("[data-field='tag']")?.value.trim() || "";
+    const active = row.querySelector("[data-field='active']")?.value !== "false";
+    const available = row.querySelector("[data-field='available']")?.value !== "false";
+
+    let statusOk = true;
+    if (productStatusFilter === "active") statusOk = active;
+    if (productStatusFilter === "inactive") statusOk = !active;
+    if (productStatusFilter === "unavailable") statusOk = !available;
+
+    let searchOk = true;
+    if (term) {
+      const haystack = `${id} ${nameAr} ${nameEn} ${tag}`.toLowerCase();
+      searchOk = haystack.includes(term);
+    }
+
+    row.style.display = statusOk && searchOk ? "" : "none";
+  });
+};
+
 const addCategoryRow = (category = {}, prepend = false) => {
   if (!categoriesInputs) {
     return;
@@ -985,6 +1038,9 @@ const addProductRow = (product = {}, prepend = false) => {
     <div class="list-row product-row" data-type="product" data-index="${index}" ${
       isData ? 'data-image-data="true"' : ""
     }>
+      <div class="drag-handle" data-drag-handle="true" title="${t("dragHint")}" draggable="true">
+        ${t("dragLabel")}
+      </div>
       <input type="text" data-field="id" data-i18n-placeholder="productIdPlaceholder" placeholder="${t(
         "productIdPlaceholder"
       )}" value="${product.id || ""}" />
@@ -1003,21 +1059,13 @@ const addProductRow = (product = {}, prepend = false) => {
       <input type="number" data-field="price" data-i18n-placeholder="productPricePlaceholder" placeholder="${t(
         "productPricePlaceholder"
       )}" value="${product.price || ""}" />
-      <div class="image-cell">
-        <img class="image-preview mini-preview" src="${preview}" alt="Product preview" />
-        <div class="image-actions">
-          <label class="ghost file-btn">
-            <span data-i18n="uploadImage">${t("uploadImage")}</span>
-            <input type="file" class="image-input" accept="image/*" />
-          </label>
-          <button class="ghost danger" type="button" data-action="clear-image" data-i18n="clearImage">${t(
-            "clearImage"
-          )}</button>
-        </div>
-        <input type="text" data-field="image" data-i18n-placeholder="productImagePlaceholder" placeholder="${t(
-          "productImagePlaceholder"
-        )}" value="${!isData ? imageValue : ""}" />
-      </div>
+      <input type="number" data-field="comparePrice" data-i18n-placeholder="comparePriceLabel" placeholder="${t(
+        "comparePriceLabel"
+      )}" value="${product.comparePrice ?? ""}" />
+      <label class="toggle-field">
+        <input type="checkbox" data-field="showComparePrice" ${product.showComparePrice ? "checked" : ""} />
+        <span data-i18n="comparePriceToggle">${t("comparePriceToggle")}</span>
+      </label>
       <input type="text" data-field="name.ar" data-i18n-placeholder="productNameArPlaceholder" placeholder="${t(
         "productNameArPlaceholder"
       )}" value="${product.name?.ar || ""}" />
@@ -1030,7 +1078,23 @@ const addProductRow = (product = {}, prepend = false) => {
       <textarea data-field="desc.en" data-i18n-placeholder="productDescEnPlaceholder" placeholder="${t(
         "productDescEnPlaceholder"
       )}">${product.desc?.en || ""}</textarea>
+      <div class="image-cell">
+        <img class="image-preview mini-preview" src="${preview}" alt="Product preview" />
+        <div class="image-actions">
+          <label class="ghost file-btn">
+            <span data-i18n="uploadImage">${t("uploadImage")}</span>
+            <input type="file" class="image-input" accept="image/*" />
+          </label>
+          <button class="ghost danger" type="button" data-action="clear-image" data-i18n="clearImage">${t(
+            "clearImage"
+          )}</button>
+        </div>
+        <input type="hidden" data-field="image" value="${!isData ? imageValue : ""}" />
+      </div>
       <div class="row-actions">
+        <button class="ghost" data-action="preview-product" data-i18n="previewProduct">${t(
+          "previewProduct"
+        )}</button>
         <button class="ghost danger" data-action="remove-product" data-i18n="remove">${t(
           "remove"
         )}</button>
@@ -1048,11 +1112,13 @@ const addProductRow = (product = {}, prepend = false) => {
   if (row && isData) {
     row.dataset.imageData = imageValue;
   }
+  applyProductFilters();
 };
 
 const renderProducts = () => {
   productsInputs.innerHTML = "";
   (storeData.products || []).forEach((product) => addProductRow(product));
+  applyProductFilters();
 };
 
 const addHomeSampleRow = (itemId = "", prepend = false) => {
@@ -1172,21 +1238,6 @@ const addTestimonialRow = (testimonial = {}, prepend = false) => {
       <div class="list-row product-row" data-type="testimonial" data-index="${index}" ${
         isData ? 'data-image-data="true"' : ""
       }>
-        <div class="image-cell">
-          <img class="image-preview mini-preview" src="${preview}" alt="Testimonial preview" />
-          <div class="image-actions">
-            <label class="ghost file-btn">
-              <span data-i18n="uploadImage">${t("uploadImage")}</span>
-              <input type="file" class="image-input" accept="image/*" />
-            </label>
-            <button class="ghost danger" type="button" data-action="clear-testimonial-image" data-i18n="clearImage">${t(
-              "clearImage"
-            )}</button>
-          </div>
-          <input type="text" data-field="image" data-i18n-placeholder="testimonialImagePlaceholder" placeholder="${t(
-            "testimonialImagePlaceholder"
-          )}" value="${!isData ? imageValue : ""}" />
-        </div>
         <textarea data-field="quote.ar" data-i18n-placeholder="testimonialQuoteArPlaceholder" placeholder="${t(
           "testimonialQuoteArPlaceholder"
         )}">${testimonial.quote?.ar || ""}</textarea>
@@ -1199,6 +1250,19 @@ const addTestimonialRow = (testimonial = {}, prepend = false) => {
         <input type="text" data-field="name.en" data-i18n-placeholder="testimonialNameEnPlaceholder" placeholder="${t(
           "testimonialNameEnPlaceholder"
         )}" value="${testimonial.name?.en || ""}" />
+        <div class="image-cell">
+          <img class="image-preview mini-preview" src="${preview}" alt="Testimonial preview" />
+          <div class="image-actions">
+            <label class="ghost file-btn">
+              <span data-i18n="uploadImage">${t("uploadImage")}</span>
+              <input type="file" class="image-input" accept="image/*" />
+            </label>
+            <button class="ghost danger" type="button" data-action="clear-testimonial-image" data-i18n="clearImage">${t(
+              "clearImage"
+            )}</button>
+          </div>
+          <input type="hidden" data-field="image" value="${!isData ? imageValue : ""}" />
+        </div>
         <div class="row-actions">
           <button class="ghost danger" data-action="remove-testimonial" data-i18n="remove">${t(
             "remove"
@@ -1678,6 +1742,8 @@ const saveAll = async () => {
       available: row.querySelector("[data-field='available']")?.value !== "false",
       tag: row.querySelector("[data-field='tag']").value.trim(),
       price: Number(row.querySelector("[data-field='price']").value) || 0,
+      comparePrice: Number(row.querySelector("[data-field='comparePrice']").value) || 0,
+      showComparePrice: row.querySelector("[data-field='showComparePrice']")?.checked || false,
       image: imageData || row.querySelector("[data-field='image']").value.trim(),
       name: {
         ar: row.querySelector("[data-field='name.ar']").value.trim(),
@@ -2014,9 +2080,23 @@ const bindEvents = () => {
 
   productsInputs.addEventListener("click", (event) => {
     const target = event.target;
+    if (target.dataset.action === "preview-product") {
+      const row = target.closest(".list-row");
+      if (!row) {
+        return;
+      }
+      const id = row.querySelector("[data-field='id']")?.value.trim();
+      if (!id) {
+        alert(t("productIdPlaceholder"));
+        return;
+      }
+      window.open(`product-details.html?id=${encodeURIComponent(id)}`, "_blank");
+      return;
+    }
     if (target.dataset.action === "remove-product") {
       target.closest(".list-row").remove();
       refreshProductOptions();
+      applyProductFilters();
     }
     if (target.dataset.action === "clear-image") {
       const row = target.closest(".list-row");
@@ -2039,7 +2119,62 @@ const bindEvents = () => {
 
   productsInputs.addEventListener("input", () => {
     refreshProductOptions();
+    applyProductFilters();
   });
+
+  productsInputs.addEventListener("dragstart", (event) => {
+    if (!event.target.closest(".drag-handle")) {
+      event.preventDefault();
+      return;
+    }
+    const row = event.target.closest(".list-row[data-type='product']");
+    if (!row) {
+      return;
+    }
+    draggingProductRow = row;
+    row.classList.add("dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", "drag");
+  });
+
+  productsInputs.addEventListener("dragover", (event) => {
+    if (!draggingProductRow) {
+      return;
+    }
+    event.preventDefault();
+    const targetRow = event.target.closest(".list-row[data-type='product']");
+    if (!targetRow || targetRow === draggingProductRow) {
+      return;
+    }
+    const rect = targetRow.getBoundingClientRect();
+    const shouldInsertAfter = event.clientY - rect.top > rect.height / 2;
+    productsInputs.insertBefore(
+      draggingProductRow,
+      shouldInsertAfter ? targetRow.nextSibling : targetRow
+    );
+    setSaveNote("saveNote", "");
+  });
+
+  productsInputs.addEventListener("dragend", () => {
+    if (draggingProductRow) {
+      draggingProductRow.classList.remove("dragging");
+    }
+    draggingProductRow = null;
+  });
+
+  if (productsStatusFilter) {
+    productsStatusFilter.addEventListener("change", () => {
+      productStatusFilter = productsStatusFilter.value || "all";
+      applyProductFilters();
+    });
+  }
+
+  if (productsSearchInput) {
+    productsSearchInput.addEventListener("input", () => {
+      productSearchTerm = productsSearchInput.value.trim();
+      applyProductFilters();
+    });
+  }
 
   if (featuredItemsInputs) {
     featuredItemsInputs.addEventListener("click", (event) => {

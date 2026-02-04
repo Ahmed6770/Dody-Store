@@ -73,22 +73,6 @@ const i18n = {
   }
 };
 
-let lang = localStorage.getItem("dodyDashLang") || "ar";
-let storeData = deepClone(defaultData);
-let currentOrder = null;
-
-const t = (key) => i18n[lang]?.[key] || key;
-const getLocale = () => (lang === "ar" ? "ar-EG" : "en-US");
-const formatCurrency = (value) => `${value} ${lang === "ar" ? "جنيه" : "EGP"}`;
-
-const formatPhone = (value) => {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (digits.startsWith("0") && digits.length === 11) {
-    return `20${digits.slice(1)}`;
-  }
-  return digits;
-};
-
 const defaultData = window.DODY_DEFAULT_DATA || {};
 const deepClone = (data) => JSON.parse(JSON.stringify(data));
 
@@ -107,6 +91,22 @@ const mergeDeep = (target, source) => {
     }
   });
   return target;
+};
+
+let lang = localStorage.getItem("dodyDashLang") || "ar";
+let storeData = deepClone(defaultData);
+let currentOrder = null;
+
+const t = (key) => i18n[lang]?.[key] || key;
+const getLocale = () => (lang === "ar" ? "ar-EG" : "en-US");
+const formatCurrency = (value) => `${value} ${lang === "ar" ? "جنيه" : "EGP"}`;
+
+const formatPhone = (value) => {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (digits.startsWith("0") && digits.length === 11) {
+    return `20${digits.slice(1)}`;
+  }
+  return digits;
 };
 
 const loadStoreData = async () => {

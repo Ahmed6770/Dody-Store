@@ -211,6 +211,8 @@ const renderBundle = () => {
 
   bundleImage.src = bundle.image || "assets/products/bundle.svg";
   bundleImage.alt = bundle.name?.[currentLang] || "Bundle";
+  bundleImage.loading = "eager";
+  bundleImage.decoding = "async";
   bundleName.textContent = bundle.name?.[currentLang] || "";
   bundleDesc.textContent = bundle.desc?.[currentLang] || "";
   bundlePrice.textContent = formatCurrency(bundle.price || 0, currentLang);
@@ -245,6 +247,8 @@ const renderBundle = () => {
       const img = document.createElement("img");
       img.src = product.image || "assets/products/bundle.svg";
       img.alt = product.name?.[currentLang] || "Item";
+      img.loading = "lazy";
+      img.decoding = "async";
 
       const name = document.createElement("h4");
       name.textContent = product.name?.[currentLang] || "";
