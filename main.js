@@ -488,13 +488,17 @@ const renderProducts = () => {
     ask.textContent = translations[currentLang].askProduct;
     ask.dataset.productId = product.id;
 
+    const actionsRow = document.createElement("div");
+    actionsRow.className = "product-actions-row";
+    actionsRow.appendChild(details);
+    actionsRow.appendChild(ask);
+
     card.appendChild(img);
     card.appendChild(meta);
     card.appendChild(name);
     card.appendChild(desc);
     card.appendChild(priceRow);
-    card.appendChild(details);
-    card.appendChild(ask);
+    card.appendChild(actionsRow);
 
     productGrid.appendChild(card);
   });
@@ -661,8 +665,8 @@ const getGiftMessage = () => {
 const renderFooter = () => {
   const labels =
     currentLang === "ar"
-      ? { whatsapp: "واتساب", insta: "إنستجرام" }
-      : { whatsapp: "WhatsApp", insta: "Instagram" };
+      ? { whatsapp: "واتساب", insta: "إنستجرام", facebook: "فيسبوك" }
+      : { whatsapp: "WhatsApp", insta: "Instagram", facebook: "Facebook" };
   setText("footerDesc", storeData.footer?.desc?.[currentLang] || "");
   setText(
     "footerWhatsapp",
@@ -671,6 +675,10 @@ const renderFooter = () => {
   setText(
     "footerInsta",
     `${labels.insta}: ${storeData.footer?.contact?.instagram || ""}`
+  );
+  setText(
+    "footerFacebook",
+    `${labels.facebook}: ${storeData.footer?.contact?.facebook || ""}`
   );
   setText("footerHours", storeData.footer?.hours?.[currentLang] || "");
 
@@ -1059,20 +1067,6 @@ const sendOrderEmail = (formData, order) => {
   });
 };
 
-const sendOrderWhatsAppNotify = (formData, order) => {
-  const number = storeData.notifications?.whatsapp?.number || "";
-  const apiKey = storeData.notifications?.whatsapp?.apiKey || "";
-  if (!number || !apiKey) {
-    return;
-  }
-  const message = buildOrderMessage(formData, order.id);
-  const url = `https://api.callmebot.com/whatsapp.php?phone=${encodeURIComponent(
-    number
-  )}&text=${encodeURIComponent(message)}&apikey=${encodeURIComponent(apiKey)}`;
-  fetch(url).catch(() => {
-    // silent fail
-  });
-};
 
 const buildOrderMessage = (formData, orderId) => {
   const itemsLines = cart
@@ -1318,6 +1312,13 @@ orderForm.addEventListener("submit", async (event) => {
 
   updateOrderStatus("orderSending", "hint");
 
+  let waWindow = null;
+  try {
+    waWindow = window.open("", "_blank");
+  } catch (error) {
+    waWindow = null;
+  }
+
   const orderPayload = {
     name,
     phone,
@@ -1336,6 +1337,9 @@ orderForm.addEventListener("submit", async (event) => {
   const savedOrder = await window.DodyApi?.createOrder?.(orderPayload);
   if (!savedOrder || !savedOrder.id) {
     updateOrderStatus("orderFailed", "error");
+    if (waWindow && !waWindow.closed) {
+      waWindow.close();
+    }
     return;
   }
 
@@ -1343,11 +1347,14 @@ orderForm.addEventListener("submit", async (event) => {
   updateOrderStatus("orderSuccess", "success");
 
   sendOrderEmail({ name, phone, address, notes }, savedOrder);
-  sendOrderWhatsAppNotify({ name, phone, address, notes }, savedOrder);
 
   const message = buildOrderMessage({ name, phone, address, notes }, savedOrder.id);
   const url = `https://wa.me/${storeWhatsApp}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
+  if (waWindow && !waWindow.closed) {
+    waWindow.location.href = url;
+  } else {
+    window.open(url, "_blank");
+  }
 
   cart = [];
   renderCart();

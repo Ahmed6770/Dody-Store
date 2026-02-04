@@ -85,10 +85,9 @@ const dashI18n = {
     storeTagEn: "وصف المتجر (إنجليزي)",
     whatsappDisplay: "واتساب (عرض)",
     whatsappIntl: "واتساب دولي (بدون +)",
-    whatsappNotifyNumber: "رقم إشعار واتساب (بدون +)",
-    whatsappNotifyKey: "مفتاح إشعار واتساب (CallMeBot)",
     ordersEmailLabel: "إيميل استقبال الطلبات",
     instagramLabel: "إنستجرام",
+    facebookLabel: "فيسبوك",
     hoursAr: "ساعات العمل (عربي)",
     hoursEn: "ساعات العمل (إنجليزي)",
     deliveryTimeAr: "وقت التوصيل (عربي)",
@@ -297,10 +296,9 @@ const dashI18n = {
     storeTagEn: "Store tagline (EN)",
     whatsappDisplay: "WhatsApp (display)",
     whatsappIntl: "WhatsApp international (no +)",
-    whatsappNotifyNumber: "WhatsApp notify number (no +)",
-    whatsappNotifyKey: "WhatsApp notify key (CallMeBot)",
     ordersEmailLabel: "Orders inbox email",
     instagramLabel: "Instagram",
+    facebookLabel: "Facebook",
     hoursAr: "Working hours (AR)",
     hoursEn: "Working hours (EN)",
     deliveryTimeAr: "Delivery time (AR)",
@@ -1374,10 +1372,9 @@ const fillInputs = () => {
   setValue("brandTagEnInput", storeData.brand?.tag?.en || "");
   setValue("whatsappDisplayInput", storeData.footer?.contact?.whatsappDisplay || "");
   setValue("whatsappIntlInput", storeData.footer?.contact?.whatsappIntl || "");
-  setValue("whatsappNotifyNumberInput", storeData.notifications?.whatsapp?.number || "");
-  setValue("whatsappNotifyKeyInput", storeData.notifications?.whatsapp?.apiKey || "");
   setValue("ordersEmailInput", storeData.orders?.email || "");
   setValue("instagramInput", storeData.footer?.contact?.instagram || "");
+  setValue("facebookInput", storeData.footer?.contact?.facebook || "");
   setValue("hoursArInput", storeData.footer?.hours?.ar || "");
   setValue("hoursEnInput", storeData.footer?.hours?.en || "");
   setValue("deliveryTimeArInput", storeData.delivery?.time?.ar || "");
@@ -1481,7 +1478,8 @@ const saveAll = async () => {
   updated.footer.contact = updated.footer.contact || {
     whatsappDisplay: "",
     whatsappIntl: "",
-    instagram: ""
+    instagram: "",
+    facebook: ""
   };
   updated.footer.desc = updated.footer.desc || { ar: "", en: "" };
   updated.footer.hours = updated.footer.hours || { ar: "", en: "" };
@@ -1489,8 +1487,6 @@ const saveAll = async () => {
   updated.delivery = updated.delivery || { time: { ar: "", en: "" } };
   updated.delivery.time = updated.delivery.time || { ar: "", en: "" };
   updated.home = updated.home || {};
-  updated.notifications = updated.notifications || {};
-  updated.notifications.whatsapp = updated.notifications.whatsapp || { number: "", apiKey: "" };
 
   updated.brand.name = getValue("brandNameInput");
   updated.brand.tag.ar = getValue("brandTagArInput");
@@ -1522,10 +1518,9 @@ const saveAll = async () => {
 
   updated.footer.contact.whatsappDisplay = getValue("whatsappDisplayInput");
   updated.footer.contact.whatsappIntl = getValue("whatsappIntlInput");
-  updated.notifications.whatsapp.number = getValue("whatsappNotifyNumberInput");
-  updated.notifications.whatsapp.apiKey = getValue("whatsappNotifyKeyInput");
   updated.orders.email = getValue("ordersEmailInput");
   updated.footer.contact.instagram = getValue("instagramInput");
+  updated.footer.contact.facebook = getValue("facebookInput");
   updated.footer.hours.ar = getValue("hoursArInput");
   updated.footer.hours.en = getValue("hoursEnInput");
   updated.delivery.time.ar = getValue("deliveryTimeArInput");

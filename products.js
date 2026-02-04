@@ -286,17 +286,22 @@ const renderProducts = () => {
         button.disabled = true;
       }
 
-      const details = document.createElement("button");
-      details.className = "ghost view-details details-btn";
-      details.type = "button";
-      details.textContent = translations[currentLang].viewDetails;
-      details.dataset.productId = product.id;
+    const details = document.createElement("button");
+    details.className = "ghost view-details details-btn";
+    details.type = "button";
+    details.textContent = translations[currentLang].viewDetails;
+    details.dataset.productId = product.id;
 
-      const ask = document.createElement("button");
-      ask.className = "ghost ask-product details-btn";
-      ask.type = "button";
-      ask.textContent = translations[currentLang].askProduct;
-      ask.dataset.productId = product.id;
+    const ask = document.createElement("button");
+    ask.className = "ghost ask-product details-btn";
+    ask.type = "button";
+    ask.textContent = translations[currentLang].askProduct;
+    ask.dataset.productId = product.id;
+
+    const actionsRow = document.createElement("div");
+    actionsRow.className = "product-actions-row";
+    actionsRow.appendChild(details);
+    actionsRow.appendChild(ask);
 
       priceRow.appendChild(price);
       priceRow.appendChild(button);
@@ -306,8 +311,7 @@ const renderProducts = () => {
       card.appendChild(name);
       card.appendChild(desc);
       card.appendChild(priceRow);
-      card.appendChild(details);
-      card.appendChild(ask);
+    card.appendChild(actionsRow);
 
       productGrid.appendChild(card);
     });
@@ -373,8 +377,8 @@ const openProductDetails = (productId) => {
 const renderFooter = () => {
   const labels =
     currentLang === "ar"
-      ? { whatsapp: "واتساب", insta: "إنستجرام" }
-      : { whatsapp: "WhatsApp", insta: "Instagram" };
+      ? { whatsapp: "واتساب", insta: "إنستجرام", facebook: "فيسبوك" }
+      : { whatsapp: "WhatsApp", insta: "Instagram", facebook: "Facebook" };
   setText("footerDesc", storeData.footer?.desc?.[currentLang] || "");
   setText(
     "footerWhatsapp",
@@ -383,6 +387,10 @@ const renderFooter = () => {
   setText(
     "footerInsta",
     `${labels.insta}: ${storeData.footer?.contact?.instagram || ""}`
+  );
+  setText(
+    "footerFacebook",
+    `${labels.facebook}: ${storeData.footer?.contact?.facebook || ""}`
   );
   setText("footerHours", storeData.footer?.hours?.[currentLang] || "");
 

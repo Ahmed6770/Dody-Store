@@ -173,6 +173,7 @@
           .eq("id", 1)
           .single();
         if (error) {
+          console.warn("Supabase store_data fetch error", error);
           return null;
         }
         return data?.data || null;
@@ -182,6 +183,9 @@
           id: 1,
           data: storeData
         });
+        if (error) {
+          console.warn("Supabase store_data save error", error);
+        }
         return !error;
       },
       login: async (pin) => {
@@ -218,6 +222,7 @@
           .select("*")
           .order("created_at", { ascending: false });
         if (error) {
+          console.warn("Supabase orders fetch error", error);
           return null;
         }
         return (data || []).map(mapOrderRow);
@@ -244,12 +249,16 @@
         };
         const { error } = await client.from("orders").insert(record);
         if (error) {
+          console.warn("Supabase orders insert error", error);
           return null;
         }
         return mapOrderRow(record);
       },
       clearOrders: async () => {
         const { error } = await client.from("orders").delete().neq("id", "");
+        if (error) {
+          console.warn("Supabase orders clear error", error);
+        }
         return !error;
       },
       updateOrder: async (id, patch) => {
@@ -264,12 +273,16 @@
           .select("*")
           .single();
         if (error) {
+          console.warn("Supabase orders update error", error);
           return null;
         }
         return mapOrderRow(data);
       },
       deleteOrder: async (id) => {
         const { error } = await client.from("orders").delete().eq("id", id);
+        if (error) {
+          console.warn("Supabase orders delete error", error);
+        }
         return !error;
       }
     };

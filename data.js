@@ -608,7 +608,8 @@
     contact: {
       whatsappDisplay: "0112 345 6789",
       whatsappIntl: "201123456789",
-      instagram: "@dody.store"
+      instagram: "@dody.store",
+      facebook: "facebook.com/dody.store"
     },
     hours: {
       ar: "كل يوم من 10 صباحًا حتى 10 مساءً",
