@@ -147,8 +147,22 @@
     }
     const client = window.supabase.createClient(SUPA_CONFIG.url, SUPA_CONFIG.anonKey);
 
-    const ensureId = () =>
-      `DS-${Date.now()}-${Math.floor(Math.random() * 9000 + 1000)}`;
+    const getNextOrderId = async () => {
+      let lastSeq = 10000;
+      const { data, error } = await client
+        .from("orders")
+        .select("id")
+        .order("created_at", { ascending: false })
+        .limit(1);
+      if (!error && Array.isArray(data) && data[0]?.id) {
+        const rawId = String(data[0].id);
+        const parsed = Number(rawId.replace(/^\D+/, ""));
+        if (Number.isFinite(parsed)) {
+          lastSeq = Math.max(lastSeq, parsed);
+        }
+      }
+      return `DS-${lastSeq + 1}`;
+    };
 
     const mapOrderRow = (row) => ({
       id: row.id,
@@ -228,7 +242,7 @@
         return (data || []).map(mapOrderRow);
       },
       createOrder: async (orderPayload) => {
-        const orderId = ensureId();
+        const orderId = await getNextOrderId();
         const nowIso = new Date().toISOString();
         const record = {
           id: orderId,

@@ -1108,7 +1108,7 @@ body.ltr .routine-card ol {
   position: fixed;
   top: 0;
   right: 0;
-  width: min(420px, 92vw);
+  width: min(460px, 96vw);
   height: 100%;
   background: #fff;
   box-shadow: -20px 0 40px rgba(0, 0, 0, 0.12);
@@ -1161,6 +1161,10 @@ body.ltr .cart-drawer.open {
   border-radius: 16px;
 }
 
+.cart-item strong {
+  font-size: 14px;
+}
+
 .cart-item-meta {
   display: block;
   font-size: 12px;
@@ -1175,6 +1179,32 @@ body.ltr .cart-drawer.open {
 
 .cart-item-price {
   font-weight: 600;
+}
+
+@media (max-width: 720px) {
+  .cart-drawer {
+    width: 100vw;
+    padding: 16px;
+  }
+
+  .cart-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .cart-item strong {
+    font-size: 12px;
+  }
+
+  .cart-item-meta {
+    font-size: 11px;
+  }
+
+  .cart-item-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 .cart-summary {

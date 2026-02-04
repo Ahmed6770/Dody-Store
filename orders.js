@@ -190,6 +190,7 @@ const loadStoreData = async () => {
 
 let storeData = deepClone(defaultData);
 let ordersCache = [];
+let ordersPoll = null;
 
 const loadOrders = () => ordersCache;
 const setOrders = (orders) => {
@@ -419,6 +420,15 @@ const refreshOrders = async () => {
   renderOrders();
 };
 
+const startOrdersPolling = () => {
+  if (ordersPoll) {
+    clearInterval(ordersPoll);
+  }
+  ordersPoll = setInterval(() => {
+    refreshOrders();
+  }, 15000);
+};
+
 const escapeHtml = (value) =>
   String(value ?? "").replace(/[&<>"']/g, (char) => {
     const map = {
@@ -531,6 +541,7 @@ const bindEvents = () => {
         adminPinHint.textContent = "";
         showGate(false);
         await refreshOrders();
+        startOrdersPolling();
       } else {
         adminPinHint.dataset.i18n = "adminPinError";
         adminPinHint.textContent = t("adminPinError");
@@ -642,6 +653,7 @@ const init = async () => {
   }
   if (authed) {
     await refreshOrders();
+    startOrdersPolling();
   }
   applyLang();
   bindEvents();

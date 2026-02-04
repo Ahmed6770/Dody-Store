@@ -380,18 +380,32 @@ const renderFooter = () => {
       ? { whatsapp: "واتساب", insta: "إنستجرام", facebook: "فيسبوك" }
       : { whatsapp: "WhatsApp", insta: "Instagram", facebook: "Facebook" };
   setText("footerDesc", storeData.footer?.desc?.[currentLang] || "");
-  setText(
-    "footerWhatsapp",
-    `${labels.whatsapp}: ${storeData.footer?.contact?.whatsappDisplay || ""}`
-  );
-  setText(
-    "footerInsta",
-    `${labels.insta}: ${storeData.footer?.contact?.instagram || ""}`
-  );
-  setText(
-    "footerFacebook",
-    `${labels.facebook}: ${storeData.footer?.contact?.facebook || ""}`
-  );
+  const whatsappLink = document.getElementById("footerWhatsappLink");
+  const instaLink = document.getElementById("footerInstaLink");
+  const facebookLink = document.getElementById("footerFacebookLink");
+
+  const whatsappIntl = storeData.footer?.contact?.whatsappIntl || "";
+  const whatsappDisplay = storeData.footer?.contact?.whatsappDisplay || "";
+  if (whatsappLink) {
+    whatsappLink.textContent = `${labels.whatsapp}: ${whatsappDisplay || whatsappIntl}`;
+    whatsappLink.href = whatsappIntl
+      ? `https://wa.me/${whatsappIntl}`
+      : "https://wa.me/201123456789";
+  }
+
+  const insta = storeData.footer?.contact?.instagram || "";
+  if (instaLink) {
+    instaLink.textContent = `${labels.insta}: ${insta}`;
+    const handle = insta.replace(/^@/, "");
+    instaLink.href = handle ? `https://instagram.com/${handle}` : "#";
+  }
+
+  const facebook = storeData.footer?.contact?.facebook || "";
+  if (facebookLink) {
+    facebookLink.textContent = `${labels.facebook}: ${facebook}`;
+    const fbUrl = facebook.startsWith("http") ? facebook : `https://${facebook}`;
+    facebookLink.href = facebook ? fbUrl : "#";
+  }
   setText("footerHours", storeData.footer?.hours?.[currentLang] || "");
 
   const footerServicesList = document.getElementById("footerServicesList");

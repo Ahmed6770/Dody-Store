@@ -44,6 +44,7 @@ const loadStoreData = async () => {
 };
 
 let storeData = deepClone(defaultData);
+let ordersPoll = null;
 
 let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 const dashI18n = {
@@ -1366,6 +1367,15 @@ const refreshOrders = async () => {
   renderOrders();
 };
 
+const startOrdersPolling = () => {
+  if (ordersPoll) {
+    clearInterval(ordersPoll);
+  }
+  ordersPoll = setInterval(() => {
+    refreshOrders();
+  }, 15000);
+};
+
 const fillInputs = () => {
   setValue("brandNameInput", storeData.brand?.name || "");
   setValue("brandTagArInput", storeData.brand?.tag?.ar || "");
@@ -1920,6 +1930,7 @@ const bindEvents = () => {
         adminPinHint.textContent = "";
         showGate(false);
         await refreshOrders();
+        startOrdersPolling();
       } else {
         adminPinHint.dataset.i18n = "adminPinError";
         adminPinHint.textContent = t("adminPinError");
@@ -2210,6 +2221,7 @@ const init = async () => {
 
   if (authed) {
     await refreshOrders();
+    startOrdersPolling();
   }
 
   const hash = window.location.hash?.replace("#", "");
