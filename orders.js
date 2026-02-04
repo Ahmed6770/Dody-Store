@@ -210,6 +210,7 @@ const loadStoreData = async () => {
 let storeData = deepClone(defaultData);
 let ordersCache = [];
 let ordersPoll = null;
+let ordersVisibilityBound = false;
 let orderStatusFilter = "all";
 let orderSearchTerm = "";
 
@@ -472,8 +473,20 @@ const startOrdersPolling = () => {
     clearInterval(ordersPoll);
   }
   ordersPoll = setInterval(() => {
+    if (document.hidden) {
+      return;
+    }
     refreshOrders();
   }, 15000);
+
+  if (!ordersVisibilityBound) {
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        refreshOrders();
+      }
+    });
+    ordersVisibilityBound = true;
+  }
 };
 
 const escapeHtml = (value) =>

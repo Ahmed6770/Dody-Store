@@ -12,7 +12,8 @@
     pin: "2026"
   },
   orders: {
-    email: ""
+    email: "",
+    telegramEnabled: true
   },
   delivery: {
     time: {

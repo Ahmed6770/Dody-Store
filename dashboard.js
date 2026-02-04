@@ -57,6 +57,7 @@ let draggingProductRow = null;
 let productStatusFilter = "all";
 let productSearchTerm = "";
 let telegramSettings = null;
+let ordersVisibilityBound = false;
 
 let dashLang = localStorage.getItem("dodyDashLang") || "ar";
 const dashI18n = {
@@ -603,6 +604,14 @@ const loadImageElement = (file) =>
     };
     img.src = url;
   });
+
+const debounce = (fn, delay = 250) => {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+};
 
 const resizeImageFile = async (file, options) => {
   const {
@@ -1528,8 +1537,20 @@ const startOrdersPolling = () => {
     clearInterval(ordersPoll);
   }
   ordersPoll = setInterval(() => {
+    if (document.hidden) {
+      return;
+    }
     refreshOrders();
   }, 15000);
+
+  if (!ordersVisibilityBound) {
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) {
+        refreshOrders();
+      }
+    });
+    ordersVisibilityBound = true;
+  }
 };
 
 const fillInputs = () => {
@@ -1539,6 +1560,9 @@ const fillInputs = () => {
   setValue("whatsappDisplayInput", storeData.footer?.contact?.whatsappDisplay || "");
   setValue("whatsappIntlInput", storeData.footer?.contact?.whatsappIntl || "");
   setValue("ordersEmailInput", storeData.orders?.email || "");
+  if (telegramEnabledToggle) {
+    telegramEnabledToggle.checked = storeData.orders?.telegramEnabled !== false;
+  }
   setValue("instagramInput", storeData.footer?.contact?.instagram || "");
   setValue("facebookInput", storeData.footer?.contact?.facebook || "");
   setValue("hoursArInput", storeData.footer?.hours?.ar || "");
@@ -1645,18 +1669,19 @@ const fillTelegramInputs = () => {
 
 const applyTelegramMode = () => {
   const isSupabase = window.DODY_BACKEND === "supabase";
-  const fields = [
-    document.getElementById("telegramChatIdInput"),
-    document.getElementById("telegramTokenInput"),
-    telegramEnabledToggle,
-  ].filter(Boolean);
+  const chatInput = document.getElementById("telegramChatIdInput");
+  const tokenInput = document.getElementById("telegramTokenInput");
   if (isSupabase) {
-    fields.forEach((field) => {
-      field.disabled = true;
-    });
+    if (chatInput) chatInput.disabled = true;
+    if (tokenInput) tokenInput.disabled = true;
+    if (telegramEnabledToggle) telegramEnabledToggle.disabled = false;
     if (telegramTokenHint) {
       telegramTokenHint.textContent = t("telegramSupabaseHint");
     }
+  } else {
+    if (chatInput) chatInput.disabled = false;
+    if (tokenInput) tokenInput.disabled = false;
+    if (telegramEnabledToggle) telegramEnabledToggle.disabled = false;
   }
 };
 
@@ -1705,6 +1730,7 @@ const saveAll = async () => {
   updated.footer.contact.whatsappDisplay = getValue("whatsappDisplayInput");
   updated.footer.contact.whatsappIntl = getValue("whatsappIntlInput");
   updated.orders.email = getValue("ordersEmailInput");
+  updated.orders.telegramEnabled = telegramEnabledToggle ? telegramEnabledToggle.checked : true;
   if (window.DodyApi?.saveTelegramSettings) {
     await window.DodyApi.saveTelegramSettings({
       chatId: getValue("telegramChatIdInput"),
@@ -2251,9 +2277,13 @@ const bindEvents = () => {
     }
   });
 
-  productsInputs.addEventListener("input", () => {
+  const debouncedProductRefresh = debounce(() => {
     refreshProductOptions();
     applyProductFilters();
+  }, 250);
+
+  productsInputs.addEventListener("input", () => {
+    debouncedProductRefresh();
   });
 
   productsInputs.addEventListener("dragstart", (event) => {
