@@ -419,7 +419,7 @@ button:hover {
 }
 
 .filter-bar {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto 24px;
   display: flex;
   flex-wrap: wrap;
@@ -464,7 +464,7 @@ button:hover {
 }
 
 .product-grid {
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(230px, 260px));
@@ -1198,6 +1198,14 @@ body.ltr .cart-drawer.open {
   .cart-drawer {
     width: 100vw;
     padding: 16px;
+    overflow-y: auto;
+  }
+
+  .cart-items {
+    flex: none;
+    max-height: none;
+    overflow: visible;
+    padding-right: 0;
   }
 
   .cart-item {
