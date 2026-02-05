@@ -1869,7 +1869,7 @@ const applyTelegramMode = () => {
   const chatInput = document.getElementById("telegramChatIdInput");
   const tokenInput = document.getElementById("telegramTokenInput");
   if (isSupabase) {
-    if (chatInput) chatInput.disabled = true;
+    if (chatInput) chatInput.disabled = false;
     if (tokenInput) tokenInput.disabled = true;
     if (telegramEnabledToggle) telegramEnabledToggle.disabled = false;
     if (telegramTokenHint) {

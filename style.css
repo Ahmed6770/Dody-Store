@@ -724,10 +724,10 @@ button:hover {
 
   .product-card .details-btn,
   .product-card .ask-product {
-    font-size: 11px;
+    font-size: 10px;
     padding: 6px 8px;
-    width: 100%;
-    white-space: normal;
+    width: auto;
+    white-space: nowrap;
     line-height: 1.2;
     min-width: 0;
     text-align: center;
@@ -735,6 +735,26 @@ button:hover {
 
   .product-actions-row {
     gap: 6px;
+    flex-wrap: nowrap;
+  }
+
+  .price-row {
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .price-row .compare-price {
+    order: 1;
+  }
+
+  .price-row .price {
+    order: 2;
+  }
+
+  .price-row .add-to-cart {
+    order: 3;
+    width: 100%;
+    margin-top: 6px;
   }
 
   .image-zoom-frame {
@@ -1516,6 +1536,11 @@ body.ltr .cart-drawer.open {
   align-items: center;
 }
 
+#bundleItemsCard {
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
 .product-details-media img {
   width: 100%;
   height: 320px;
@@ -1584,7 +1609,16 @@ body.ltr .cart-drawer.open {
 .bundle-items {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+#bundleItems.bundle-items {
+  grid-template-columns: repeat(2, minmax(160px, 1fr));
+}
+
+@media (min-width: 800px) {
+  #bundleItems.bundle-items {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
 }
 
 .bundle-item-card {
@@ -1741,5 +1775,37 @@ body.ltr .cart-drawer.open {
   .product-details-media img {
     height: 240px;
     padding: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .product-details-actions {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .product-details-actions .price,
+  .product-details-actions .compare-price {
+    order: 1;
+    white-space: nowrap;
+  }
+
+  .product-details-actions .compare-price {
+    font-size: 11px;
+    margin-inline-start: 6px;
+  }
+
+  .product-details-actions .mini {
+    order: 2;
+    font-size: 11px;
+    padding: 7px 10px;
+  }
+
+  .product-details-actions .ghost {
+    order: 3;
+    font-size: 10px;
+    padding: 6px 9px;
+    white-space: nowrap;
   }
 }
