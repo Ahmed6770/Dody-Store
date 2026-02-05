@@ -105,6 +105,129 @@ const getLocale = (lang) => (lang === "ar" ? "ar-EG" : "en-US");
 const formatCurrency = (amount, lang) =>
   lang === "ar" ? `${amount} جنيه` : `EGP ${amount}`;
 
+let zoomUI = null;
+const ensureImageZoom = () => {
+  if (zoomUI) {
+    return;
+  }
+  const overlayEl = document.createElement("div");
+  overlayEl.className = "image-zoom-overlay";
+  overlayEl.id = "imageZoomOverlay";
+  overlayEl.innerHTML = `
+    <div class="image-zoom-frame" role="dialog" aria-modal="true">
+      <button class="image-zoom-close" type="button" aria-label="Close">×</button>
+      <div class="image-zoom-stage">
+        <img class="image-zoom-img" alt="" />
+      </div>
+      <div class="image-zoom-controls">
+        <button class="image-zoom-btn" type="button" data-zoom="out">-</button>
+        <span class="image-zoom-label">100%</span>
+        <button class="image-zoom-btn" type="button" data-zoom="in">+</button>
+        <button class="image-zoom-btn" type="button" data-zoom="reset">100%</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlayEl);
+
+  const stage = overlayEl.querySelector(".image-zoom-stage");
+  const img = overlayEl.querySelector(".image-zoom-img");
+  const label = overlayEl.querySelector(".image-zoom-label");
+  const closeBtn = overlayEl.querySelector(".image-zoom-close");
+  let fitWidth = 0;
+  let fitHeight = 0;
+  let zoom = 1;
+
+  const setZoom = (value) => {
+    const next = Math.min(3, Math.max(1, value));
+    zoom = next;
+    if (fitWidth && fitHeight) {
+      img.style.width = `${fitWidth * zoom}px`;
+      img.style.height = `${fitHeight * zoom}px`;
+    }
+    label.textContent = `${Math.round(zoom * 100)}%`;
+  };
+
+  const applyFit = () => {
+    const stageRect = stage.getBoundingClientRect();
+    const ratio = Math.min(
+      stageRect.width / img.naturalWidth,
+      stageRect.height / img.naturalHeight,
+      1
+    );
+    fitWidth = img.naturalWidth * ratio;
+    fitHeight = img.naturalHeight * ratio;
+    setZoom(1);
+    stage.scrollTop = 0;
+    stage.scrollLeft = 0;
+  };
+
+  const close = () => {
+    overlayEl.classList.remove("show");
+    img.src = "";
+    img.alt = "";
+  };
+
+  overlayEl.addEventListener("click", (event) => {
+    if (event.target === overlayEl) {
+      close();
+    }
+  });
+  closeBtn.addEventListener("click", close);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && overlayEl.classList.contains("show")) {
+      close();
+    }
+  });
+
+  overlayEl.querySelectorAll("[data-zoom]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const action = button.dataset.zoom;
+      if (action === "in") {
+        setZoom(zoom + 0.2);
+      } else if (action === "out") {
+        setZoom(zoom - 0.2);
+      } else {
+        setZoom(1);
+      }
+    });
+  });
+
+  stage.addEventListener(
+    "wheel",
+    (event) => {
+      event.preventDefault();
+      setZoom(zoom + (event.deltaY < 0 ? 0.1 : -0.1));
+    },
+    { passive: false }
+  );
+
+  let lastTap = 0;
+  stage.addEventListener("touchend", () => {
+    const now = Date.now();
+    if (now - lastTap < 280) {
+      setZoom(zoom > 1 ? 1 : 2);
+    }
+    lastTap = now;
+  });
+
+  zoomUI = { overlay: overlayEl, img, applyFit };
+};
+
+const openImageZoom = (sourceImg) => {
+  if (!sourceImg) {
+    return;
+  }
+  ensureImageZoom();
+  zoomUI.img.src = sourceImg.dataset.zoomSrc || sourceImg.currentSrc || sourceImg.src;
+  zoomUI.img.alt = sourceImg.alt || "";
+  zoomUI.overlay.classList.add("show");
+  if (zoomUI.img.complete) {
+    zoomUI.applyFit();
+  } else {
+    zoomUI.img.onload = () => zoomUI.applyFit();
+  }
+};
+
 const setText = (id, value) => {
   const element = document.getElementById(id);
   if (element) {
@@ -241,7 +364,7 @@ const renderProducts = () => {
       card.dataset.available = product.available !== false ? "true" : "false";
 
       const img = document.createElement("img");
-      img.className = "product-image";
+      img.className = "product-image zoomable";
       img.src = product.image || "assets/products/bundle.svg";
       img.alt = product.name?.[currentLang] || "Product";
       img.loading = "lazy";
@@ -529,6 +652,11 @@ if (clearFiltersBtn) {
 
 if (productGrid) {
   productGrid.addEventListener("click", (event) => {
+    const zoomImg = event.target.closest("img.zoomable");
+    if (zoomImg) {
+      openImageZoom(zoomImg);
+      return;
+    }
     const addButton = event.target.closest(".add-to-cart");
     if (addButton) {
       if (addButton.disabled) {

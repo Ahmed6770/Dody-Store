@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Fraunces:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap');
 
 :root {
   --bg: #f7f2ee;
@@ -9,6 +9,9 @@
   --peach: #f3d4c6;
   --cream: #fff7f1;
   --shadow: 0 24px 50px rgba(47, 37, 32, 0.12);
+  --font-base: "Cairo", "Tajawal", "Noto Sans Arabic", "Noto Kufi Arabic", "Segoe UI", Tahoma,
+    Arial, sans-serif;
+  --font-display: var(--font-base);
 }
 
 * {
@@ -18,10 +21,14 @@
 }
 
 body {
-  font-family: "Cairo", sans-serif;
+  font-family: var(--font-base);
   background: radial-gradient(circle at top, #fff, #f6ebe3 45%, #f3e0d4 100%);
   color: var(--ink);
   line-height: 1.7;
+}
+
+html[dir="rtl"] {
+  --font-display: var(--font-base);
 }
 
 a {
@@ -113,6 +120,12 @@ button {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
 button:hover {
   transform: translateY(-2px);
 }
@@ -180,7 +193,7 @@ button:hover {
 }
 
 .hero h1 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-display);
   font-size: clamp(32px, 4vw, 52px);
   margin: 16px 0;
 }
@@ -256,8 +269,12 @@ button:hover {
   width: 100%;
   height: 150px;
   border-radius: 16px;
-  object-fit: cover;
-  background: #f3e0d4;
+  object-fit: contain;
+  object-position: center;
+  background: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid rgba(110, 95, 87, 0.12);
 }
 
 .hero-image {
@@ -338,7 +355,7 @@ button:hover {
 }
 
 .section-head h2 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-display);
   font-size: clamp(26px, 3vw, 38px);
   margin-bottom: 8px;
 }
@@ -484,6 +501,7 @@ button:hover {
   max-width: 260px;
   justify-self: center;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  overflow: hidden;
 }
 
 .product-card .details-btn,
@@ -511,6 +529,7 @@ button:hover {
   width: 100%;
   margin-top: 0;
   white-space: nowrap;
+  min-width: 0;
 }
 
 .product-meta {
@@ -547,9 +566,107 @@ button:hover {
 .product-image {
   width: 100%;
   height: 160px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 16px;
-  background: #f5e3d8;
+  background: #fff;
+  padding: 10px;
+  box-sizing: border-box;
+  border: 1px solid rgba(110, 95, 87, 0.12);
+  display: block;
+  transition: transform 0.25s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.08);
+}
+
+.zoomable {
+  cursor: zoom-in;
+}
+
+.image-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 15, 12, 0.85);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1200;
+}
+
+.image-zoom-overlay.show {
+  display: flex;
+}
+
+.image-zoom-frame {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 14px;
+  width: min(940px, 92vw);
+  max-height: 90vh;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+  display: grid;
+  gap: 10px;
+}
+
+.image-zoom-stage {
+  width: 100%;
+  height: min(70vh, 620px);
+  border-radius: 16px;
+  background: #f9f7f6;
+  border: 1px solid rgba(110, 95, 87, 0.12);
+  overflow: auto;
+  display: grid;
+  place-items: center;
+  touch-action: pan-x pan-y pinch-zoom;
+}
+
+.image-zoom-img {
+  display: block;
+  max-width: none;
+  max-height: none;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(110, 95, 87, 0.1);
+  box-shadow: 0 16px 30px rgba(47, 37, 32, 0.15);
+}
+
+.image-zoom-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.image-zoom-btn {
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 14px;
+  background: #fff7f1;
+  border: 1px solid rgba(110, 95, 87, 0.2);
+}
+
+.image-zoom-label {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 52px;
+  text-align: center;
+}
+
+.image-zoom-close {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(110, 95, 87, 0.2);
+  background: #fff;
+  font-size: 18px;
+  line-height: 1;
 }
 
 @media (max-width: 720px) {
@@ -567,6 +684,7 @@ button:hover {
   .product-image {
     height: 110px;
     border-radius: 12px;
+    padding: 6px;
   }
 
   .price-row {
@@ -609,10 +727,28 @@ button:hover {
     font-size: 11px;
     padding: 6px 8px;
     width: 100%;
+    white-space: normal;
+    line-height: 1.2;
+    min-width: 0;
+    text-align: center;
   }
 
   .product-actions-row {
     gap: 6px;
+  }
+
+  .image-zoom-frame {
+    padding: 10px;
+    width: 94vw;
+  }
+
+  .image-zoom-stage {
+    height: 68vh;
+  }
+
+  .image-zoom-btn {
+    padding: 7px 10px;
+    font-size: 13px;
   }
 }
 
@@ -801,9 +937,11 @@ button:hover {
 .testimonial-card img {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 14px;
-  background: #faf6f2;
+  background: #f6ede6;
+  padding: 6px;
+  box-sizing: border-box;
 }
 
 .testimonial-caption {
@@ -1350,7 +1488,7 @@ body.ltr .cart-drawer.open {
 }
 
 .page-hero h1 {
-  font-family: "Fraunces", serif;
+  font-family: var(--font-display);
   font-size: clamp(28px, 3vw, 40px);
   margin-bottom: 10px;
 }
@@ -1381,9 +1519,23 @@ body.ltr .cart-drawer.open {
 .product-details-media img {
   width: 100%;
   height: 320px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 20px;
-  background: #f5e3d8;
+  background: #fff;
+  padding: 14px;
+  box-sizing: border-box;
+  border: 1px solid rgba(110, 95, 87, 0.1);
+  transition: transform 0.25s ease;
+}
+
+.product-details-media {
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.product-details-media img:hover {
+  transform: scale(1.04);
 }
 
 .product-badges {
@@ -1447,9 +1599,13 @@ body.ltr .cart-drawer.open {
 .bundle-item-card img {
   width: 100%;
   height: 140px;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   border-radius: 14px;
-  background: #f5e3d8;
+  background: #fff;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid rgba(110, 95, 87, 0.12);
 }
 
 .back-to-top {
@@ -1584,5 +1740,6 @@ body.ltr .cart-drawer.open {
 
   .product-details-media img {
     height: 240px;
+    padding: 10px;
   }
 }

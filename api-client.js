@@ -166,15 +166,45 @@
     const getNextOrderId = async () => {
       const baseSeq = 10000;
       try {
-        const { count, error } = await client
-          .from("orders")
-          .select("id", { count: "exact", head: true });
-        if (!error && typeof count === "number") {
-          return `DS-${baseSeq + count + 1}`;
+        const { data, error } = await client
+          .from("store_data")
+          .select("data")
+          .eq("id", 1)
+          .single();
+        if (!error && data?.data && typeof data.data === "object") {
+          const currentSeq = Number(data.data.orderSeq || baseSeq);
+          const safeSeq = Number.isFinite(currentSeq) && currentSeq >= baseSeq ? currentSeq : baseSeq;
+          const nextSeq = safeSeq + 1;
+          const updatedData = { ...data.data, orderSeq: nextSeq };
+          const { error: saveError } = await client.from("store_data").upsert({
+            id: 1,
+            data: updatedData
+          });
+          if (!saveError) {
+            return `DS-${nextSeq}`;
+          }
         }
       } catch (error) {
         // ignore
       }
+
+      try {
+        const { data, error } = await client
+          .from("orders")
+          .select("id")
+          .order("date", { ascending: false })
+          .limit(1);
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const lastId = String(data[0]?.id || "");
+          const match = lastId.match(/DS-(\d+)/);
+          if (match) {
+            return `DS-${Number(match[1]) + 1}`;
+          }
+        }
+      } catch (error) {
+        // ignore
+      }
+
       return `DS-${baseSeq + Math.floor(Date.now() / 1000)}`;
     };
 
@@ -207,9 +237,22 @@
         return data?.data || null;
       },
       saveStoreData: async (storeData) => {
+        let payload = storeData;
+        const hasSeq = Number.isFinite(Number(storeData?.orderSeq));
+        if (!hasSeq) {
+          try {
+            const { data } = await client.from("store_data").select("data").eq("id", 1).single();
+            const existingSeq = data?.data?.orderSeq;
+            if (Number.isFinite(Number(existingSeq))) {
+              payload = { ...storeData, orderSeq: existingSeq };
+            }
+          } catch (error) {
+            // ignore
+          }
+        }
         const { error } = await client.from("store_data").upsert({
           id: 1,
-          data: storeData
+          data: payload
         });
         if (error) {
           console.warn("Supabase store_data save error", error);

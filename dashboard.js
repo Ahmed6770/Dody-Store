@@ -53,7 +53,6 @@ const loadTelegramSettings = async () => {
 
 let storeData = deepClone(defaultData);
 let ordersPoll = null;
-let draggingProductRow = null;
 let productStatusFilter = "all";
 let productSearchTerm = "";
 let telegramSettings = null;
@@ -88,6 +87,8 @@ const dashI18n = {
     exportEmpty: "لا يوجد بيانات لتصديرها.",
     dragLabel: "سحب",
     dragHint: "اسحب لترتيب المنتجات",
+    moveUp: "تحريك لأعلى",
+    moveDown: "تحريك لأسفل",
     filterAll: "الكل",
     filterActive: "نشط",
     filterInactive: "غير نشط",
@@ -116,6 +117,7 @@ const dashI18n = {
     telegramEnabledLabel: "تفعيل إشعارات تيليجرام",
     telegramTokenHint: "اترك التوكن فارغًا إذا كنت لا تريد تغييره.",
     telegramSupabaseHint: "في وضع Supabase يتم ضبط التوكن والـ Chat ID من إعدادات Edge Function.",
+    imageSizeLabel: "الحجم:",
     instagramLabel: "إنستجرام",
     facebookLabel: "فيسبوك",
     hoursAr: "ساعات العمل (عربي)",
@@ -315,6 +317,8 @@ const dashI18n = {
     exportEmpty: "No data to export.",
     dragLabel: "Drag",
     dragHint: "Drag to reorder products",
+    moveUp: "Move up",
+    moveDown: "Move down",
     filterAll: "All",
     filterActive: "Active",
     filterInactive: "Inactive",
@@ -343,6 +347,7 @@ const dashI18n = {
     telegramEnabledLabel: "Enable Telegram alerts",
     telegramTokenHint: "Leave empty if you don't want to change the token.",
     telegramSupabaseHint: "In Supabase mode, set the token and chat ID in Edge Function secrets.",
+    imageSizeLabel: "Size:",
     instagramLabel: "Instagram",
     facebookLabel: "Facebook",
     hoursAr: "Working hours (AR)",
@@ -521,6 +526,55 @@ const t = (key) => dashI18n[dashLang]?.[key] || key;
 const getLocale = () => (dashLang === "ar" ? "ar-EG" : "en-US");
 const formatCurrency = (value) => `${value} ${dashLang === "ar" ? "جنيه" : "EGP"}`;
 
+const getOrderControls = () => `
+  <div class="order-controls">
+    <button
+      class="ghost order-btn"
+      type="button"
+      data-action="move-up"
+      title="${t("moveUp")}"
+      aria-label="${t("moveUp")}"
+    >
+      &#9650;
+    </button>
+    <button
+      class="ghost order-btn"
+      type="button"
+      data-action="move-down"
+      title="${t("moveDown")}"
+      aria-label="${t("moveDown")}"
+    >
+      &#9660;
+    </button>
+  </div>
+`;
+
+const moveListRow = (row, direction) => {
+  if (!row || !row.parentElement) {
+    return;
+  }
+  const sibling = direction === "up" ? row.previousElementSibling : row.nextElementSibling;
+  if (!sibling) {
+    return;
+  }
+  row.parentElement.insertBefore(row, direction === "up" ? sibling : sibling.nextSibling);
+  setSaveNote("saveNote", "");
+};
+
+const handleMoveAction = (event) => {
+  const actionTarget = event.target.closest("[data-action]");
+  if (!actionTarget) {
+    return false;
+  }
+  const action = actionTarget.dataset.action;
+  if (action !== "move-up" && action !== "move-down") {
+    return false;
+  }
+  const row = actionTarget.closest(".list-row");
+  moveListRow(row, action === "move-up" ? "up" : "down");
+  return true;
+};
+
 const getValue = (id) => document.getElementById(id)?.value.trim() || "";
 const setValue = (id, value) => {
   const element = document.getElementById(id);
@@ -651,7 +705,7 @@ const resizeImageFile = async (file, options) => {
     return readFileAsDataUrl(file);
   }
 
-  if (mimeType === "image/jpeg") {
+  if (mimeType === "image/jpeg" || mimeType === "image/webp") {
     ctx.fillStyle = background;
     ctx.fillRect(0, 0, targetWidth, targetHeight);
   }
@@ -662,7 +716,97 @@ const resizeImageFile = async (file, options) => {
     source.close();
   }
 
-  return canvas.toDataURL(mimeType, quality);
+  const dataUrl = canvas.toDataURL(mimeType, quality);
+  if (mimeType === "image/webp" && !dataUrl.startsWith("data:image/webp")) {
+    return canvas.toDataURL("image/jpeg", quality);
+  }
+  return dataUrl;
+};
+
+const getDataUrlBytes = (dataUrl) => {
+  if (!dataUrl || !dataUrl.startsWith("data:")) {
+    return 0;
+  }
+  const base64 = dataUrl.split(",")[1] || "";
+  const padding = (base64.match(/=+$/) || [""])[0].length;
+  return Math.max(0, Math.floor((base64.length * 3) / 4 - padding));
+};
+
+const formatBytes = (bytes) => {
+  if (!bytes) {
+    return "0 KB";
+  }
+  const kb = bytes / 1024;
+  if (kb < 1024) {
+    const value = kb.toFixed(kb < 100 ? 1 : 0);
+    return `${value} KB`;
+  }
+  const mb = kb / 1024;
+  const value = mb.toFixed(2);
+  return `${value} MB`;
+};
+
+const formatSizeLabel = (bytes) => `${t("imageSizeLabel")} ${formatBytes(bytes)}`;
+
+const ensurePreviewWrap = (previewEl) => {
+  if (!previewEl || !previewEl.parentElement) {
+    return null;
+  }
+  let wrap = previewEl.parentElement.querySelector(".image-preview-wrap");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.className = "image-preview-wrap";
+    previewEl.insertAdjacentElement("beforebegin", wrap);
+    wrap.appendChild(previewEl);
+  }
+  return wrap;
+};
+
+const updateImageSizeLabel = (container, dataUrl) => {
+  if (!container) {
+    return;
+  }
+  const preview = container.querySelector(".image-preview");
+  const wrap = ensurePreviewWrap(preview) || container;
+  let label = wrap.querySelector(".image-size");
+  if (!label) {
+    label = document.createElement("span");
+    label.className = "image-size";
+    wrap.appendChild(label);
+  }
+  if (!dataUrl) {
+    label.textContent = "";
+    label.hidden = true;
+    label.dataset.bytes = "";
+    return;
+  }
+  const bytes = getDataUrlBytes(dataUrl);
+  label.dataset.bytes = String(bytes);
+  label.hidden = false;
+  label.textContent = formatSizeLabel(bytes);
+};
+
+const updateStandaloneImageSize = (previewEl, dataUrl) => {
+  if (!previewEl) {
+    return;
+  }
+  const wrap = ensurePreviewWrap(previewEl) || previewEl.parentElement;
+  let label = wrap.querySelector(".image-size");
+  if (!label) {
+    label = document.createElement("span");
+    label.className = "image-size";
+    wrap.appendChild(label);
+  }
+  if (!dataUrl) {
+    label.textContent = "";
+    label.hidden = true;
+    label.dataset.bytes = "";
+    return;
+  }
+  const bytes = getDataUrlBytes(dataUrl);
+  label.dataset.bytes = String(bytes);
+  label.hidden = false;
+  label.textContent = formatSizeLabel(bytes);
 };
 
 const showGate = (show) => {
@@ -706,6 +850,17 @@ const applyDashLang = () => {
     const key = element.dataset.i18nPlaceholder;
     if (dashI18n[dashLang]?.[key]) {
       element.placeholder = t(key);
+    }
+  });
+
+  document.querySelectorAll(".image-size[data-bytes]").forEach((label) => {
+    const bytes = Number(label.dataset.bytes) || 0;
+    if (bytes) {
+      label.textContent = formatSizeLabel(bytes);
+      label.hidden = false;
+    } else {
+      label.textContent = "";
+      label.hidden = true;
     }
   });
 
@@ -804,6 +959,9 @@ const renderHeroBadges = () => {
           <input type="text" data-lang="en" data-i18n-placeholder="badgeEnPlaceholder" placeholder="${t(
             "badgeEnPlaceholder"
           )}" value="${badgesEn[i] || ""}" />
+          <div class="row-actions">
+            ${getOrderControls()}
+          </div>
         </div>
       `
     );
@@ -827,6 +985,9 @@ const renderStrip = () => {
           <input type="text" data-lang="en" data-i18n-placeholder="stripEnPlaceholder" placeholder="${t(
             "stripEnPlaceholder"
           )}" value="${stripEn[i] || ""}" />
+          <div class="row-actions">
+            ${getOrderControls()}
+          </div>
         </div>
       `
     );
@@ -849,6 +1010,9 @@ const renderServices = () => {
           <input type="text" data-lang="en" data-i18n-placeholder="serviceEnPlaceholder" placeholder="${t(
             "serviceEnPlaceholder"
           )}" value="${service.en || ""}" />
+          <div class="row-actions">
+            ${getOrderControls()}
+          </div>
         </div>
       `
     );
@@ -1038,6 +1202,31 @@ const applyProductFilters = () => {
   });
 };
 
+const buildProductFromRow = (row, index = 0) => {
+  const idInput = row.querySelector("[data-field='id']");
+  const imageData = row.dataset.imageData;
+  const id = idInput?.value.trim() || `product-${index + 1}`;
+  return {
+    id,
+    category: row.querySelector("[data-field='category']")?.value || "",
+    active: row.querySelector("[data-field='active']")?.value !== "false",
+    available: row.querySelector("[data-field='available']")?.value !== "false",
+    tag: row.querySelector("[data-field='tag']")?.value.trim() || "",
+    price: Number(row.querySelector("[data-field='price']")?.value) || 0,
+    comparePrice: Number(row.querySelector("[data-field='comparePrice']")?.value) || 0,
+    showComparePrice: row.querySelector("[data-field='showComparePrice']")?.checked || false,
+    image: imageData || row.querySelector("[data-field='image']")?.value.trim() || "",
+    name: {
+      ar: row.querySelector("[data-field='name.ar']")?.value.trim() || "",
+      en: row.querySelector("[data-field='name.en']")?.value.trim() || ""
+    },
+    desc: {
+      ar: row.querySelector("[data-field='desc.ar']")?.value.trim() || "",
+      en: row.querySelector("[data-field='desc.en']")?.value.trim() || ""
+    }
+  };
+};
+
 const addCategoryRow = (category = {}, prepend = false) => {
   if (!categoriesInputs) {
     return;
@@ -1057,6 +1246,7 @@ const addCategoryRow = (category = {}, prepend = false) => {
           "categoryNameEnPlaceholder"
         )}" value="${category.label?.en || ""}" />
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-category" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1104,6 +1294,7 @@ const addCollectionRow = (collection = {}, prepend = false) => {
           "collectionTagEnPlaceholder"
         )}" value="${collection.tag?.en || ""}" />
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-collection" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1139,9 +1330,6 @@ const addProductRow = (product = {}, prepend = false) => {
     <div class="list-row product-row" data-type="product" data-index="${index}" ${
       isData ? 'data-image-data="true"' : ""
     }>
-      <div class="drag-handle" data-drag-handle="true" title="${t("dragHint")}" draggable="true">
-        ${t("dragLabel")}
-      </div>
       <input type="text" data-field="id" data-i18n-placeholder="productIdPlaceholder" placeholder="${t(
         "productIdPlaceholder"
       )}" value="${product.id || ""}" />
@@ -1193,6 +1381,7 @@ const addProductRow = (product = {}, prepend = false) => {
         <input type="hidden" data-field="image" value="${!isData ? imageValue : ""}" />
       </div>
       <div class="row-actions">
+        ${getOrderControls()}
         <button class="ghost" data-action="preview-product" data-i18n="previewProduct">${t(
           "previewProduct"
         )}</button>
@@ -1212,6 +1401,7 @@ const addProductRow = (product = {}, prepend = false) => {
   const row = productsInputs.querySelector(`.list-row[data-type='product'][data-index='${index}']`);
   if (row && isData) {
     row.dataset.imageData = imageValue;
+    updateImageSizeLabel(row.querySelector(".image-cell"), imageValue);
   }
   applyProductFilters();
 };
@@ -1236,6 +1426,7 @@ const addHomeSampleRow = (itemId = "", prepend = false) => {
           ${productOptions}
         </select>
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-home-sample" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1272,6 +1463,7 @@ const addFeaturedItemRow = (itemId = "", prepend = false) => {
           ${productOptions}
         </select>
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-featured-item" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1314,6 +1506,7 @@ const addIngredientRow = (ingredient = {}, prepend = false) => {
           "ingredientDescEnPlaceholder"
         )}">${ingredient.desc?.en || ""}</textarea>
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-ingredient" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1365,6 +1558,7 @@ const addTestimonialRow = (testimonial = {}, prepend = false) => {
           <input type="hidden" data-field="image" value="${!isData ? imageValue : ""}" />
         </div>
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost danger" data-action="remove-testimonial" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1378,6 +1572,7 @@ const addTestimonialRow = (testimonial = {}, prepend = false) => {
   );
   if (row && isData) {
     row.dataset.imageData = imageValue;
+    updateImageSizeLabel(row.querySelector(".image-cell"), imageValue);
   }
 };
 
@@ -1402,6 +1597,7 @@ const addStatRow = (stat = {}, prepend = false) => {
           "statLabelEnPlaceholder"
         )}" value="${stat.label?.en || ""}" />
         <div class="row-actions">
+          ${getOrderControls()}
           <button class="ghost" data-action="remove-stat" data-i18n="remove">${t(
             "remove"
           )}</button>
@@ -1603,6 +1799,7 @@ const fillInputs = () => {
     brandLogoPreview.src = storeData.brand.logo;
     if (storeData.brand.logo.startsWith("data:")) {
       brandLogoPreview.dataset.imageData = storeData.brand.logo;
+      updateStandaloneImageSize(brandLogoPreview, storeData.brand.logo);
     }
   }
 
@@ -1610,6 +1807,7 @@ const fillInputs = () => {
     brandFaviconPreview.src = storeData.brand.favicon;
     if (storeData.brand.favicon.startsWith("data:")) {
       brandFaviconPreview.dataset.imageData = storeData.brand.favicon;
+      updateStandaloneImageSize(brandFaviconPreview, storeData.brand.favicon);
     }
   }
 
@@ -1617,6 +1815,7 @@ const fillInputs = () => {
     featuredImagePreview.src = storeData.hero.featured.image;
     if (storeData.hero.featured.image.startsWith("data:")) {
       featuredImagePreview.dataset.imageData = storeData.hero.featured.image;
+      updateStandaloneImageSize(featuredImagePreview, storeData.hero.featured.image);
     }
   }
 
@@ -2169,6 +2368,7 @@ const bindEvents = () => {
       });
       brandLogoPreview.src = dataUrl;
       brandLogoPreview.dataset.imageData = dataUrl;
+      updateStandaloneImageSize(brandLogoPreview, dataUrl);
     });
   }
 
@@ -2185,6 +2385,7 @@ const bindEvents = () => {
       });
       brandFaviconPreview.src = dataUrl;
       brandFaviconPreview.dataset.imageData = dataUrl;
+      updateStandaloneImageSize(brandFaviconPreview, dataUrl);
     });
   }
 
@@ -2195,13 +2396,14 @@ const bindEvents = () => {
         return;
       }
       const dataUrl = await resizeImageFile(file, {
-        maxWidth: 1200,
-        maxHeight: 1200,
-        mimeType: "image/jpeg",
-        quality: 0.85,
+        maxWidth: 520,
+        maxHeight: 520,
+        mimeType: "image/webp",
+        quality: 0.55,
       });
       featuredImagePreview.src = dataUrl;
       featuredImagePreview.dataset.imageData = dataUrl;
+      updateStandaloneImageSize(featuredImagePreview, dataUrl);
     });
   }
 
@@ -2237,27 +2439,41 @@ const bindEvents = () => {
   });
 
   productsInputs.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.dataset.action === "preview-product") {
-      const row = target.closest(".list-row");
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) {
+      return;
+    }
+    const action = actionTarget.dataset.action;
+    if (action === "move-up" || action === "move-down") {
+      const row = actionTarget.closest(".list-row[data-type='product']");
+      moveListRow(row, action === "move-up" ? "up" : "down");
+      applyProductFilters();
+      return;
+    }
+    if (action === "preview-product") {
+      const row = actionTarget.closest(".list-row");
       if (!row) {
         return;
       }
-      const id = row.querySelector("[data-field='id']")?.value.trim();
-      if (!id) {
-        alert(t("productIdPlaceholder"));
-        return;
+      const rows = Array.from(productsInputs.querySelectorAll("[data-type='product']"));
+      const rowIndex = Math.max(rows.indexOf(row), 0);
+      const previewProduct = buildProductFromRow(row, rowIndex);
+      try {
+        sessionStorage.setItem("dodyPreviewProduct", JSON.stringify(previewProduct));
+      } catch (error) {
+        // ignore storage errors
       }
-      window.open(`product-details.html?id=${encodeURIComponent(id)}`, "_blank");
+      const previewId = encodeURIComponent(previewProduct.id || `preview-${Date.now()}`);
+      window.open(`product-details.html?preview=1&id=${previewId}`, "_blank");
       return;
     }
-    if (target.dataset.action === "remove-product") {
-      target.closest(".list-row").remove();
+    if (action === "remove-product") {
+      actionTarget.closest(".list-row").remove();
       refreshProductOptions();
       applyProductFilters();
     }
-    if (target.dataset.action === "clear-image") {
-      const row = target.closest(".list-row");
+    if (action === "clear-image") {
+      const row = actionTarget.closest(".list-row");
       if (!row) {
         return;
       }
@@ -2272,6 +2488,7 @@ const bindEvents = () => {
       if (fileInput) {
         fileInput.value = "";
       }
+      updateImageSizeLabel(row.querySelector(".image-cell"), "");
     }
   });
 
@@ -2282,46 +2499,6 @@ const bindEvents = () => {
 
   productsInputs.addEventListener("input", () => {
     debouncedProductRefresh();
-  });
-
-  productsInputs.addEventListener("dragstart", (event) => {
-    if (!event.target.closest(".drag-handle")) {
-      event.preventDefault();
-      return;
-    }
-    const row = event.target.closest(".list-row[data-type='product']");
-    if (!row) {
-      return;
-    }
-    draggingProductRow = row;
-    row.classList.add("dragging");
-    event.dataTransfer.effectAllowed = "move";
-    event.dataTransfer.setData("text/plain", "drag");
-  });
-
-  productsInputs.addEventListener("dragover", (event) => {
-    if (!draggingProductRow) {
-      return;
-    }
-    event.preventDefault();
-    const targetRow = event.target.closest(".list-row[data-type='product']");
-    if (!targetRow || targetRow === draggingProductRow) {
-      return;
-    }
-    const rect = targetRow.getBoundingClientRect();
-    const shouldInsertAfter = event.clientY - rect.top > rect.height / 2;
-    productsInputs.insertBefore(
-      draggingProductRow,
-      shouldInsertAfter ? targetRow.nextSibling : targetRow
-    );
-    setSaveNote("saveNote", "");
-  });
-
-  productsInputs.addEventListener("dragend", () => {
-    if (draggingProductRow) {
-      draggingProductRow.classList.remove("dragging");
-    }
-    draggingProductRow = null;
   });
 
   if (productsStatusFilter) {
@@ -2338,20 +2515,50 @@ const bindEvents = () => {
     });
   }
 
+  if (heroBadgesInputs) {
+    heroBadgesInputs.addEventListener("click", (event) => {
+      handleMoveAction(event);
+    });
+  }
+
+  if (stripInputs) {
+    stripInputs.addEventListener("click", (event) => {
+      handleMoveAction(event);
+    });
+  }
+
+  if (servicesInputs) {
+    servicesInputs.addEventListener("click", (event) => {
+      handleMoveAction(event);
+    });
+  }
+
   if (featuredItemsInputs) {
     featuredItemsInputs.addEventListener("click", (event) => {
-      const target = event.target;
-      if (target.dataset.action === "remove-featured-item") {
-        target.closest(".list-row").remove();
+      if (handleMoveAction(event)) {
+        return;
+      }
+      const actionTarget = event.target.closest("[data-action]");
+      if (!actionTarget) {
+        return;
+      }
+      if (actionTarget.dataset.action === "remove-featured-item") {
+        actionTarget.closest(".list-row").remove();
       }
     });
   }
 
   if (homeSamplesInputs) {
     homeSamplesInputs.addEventListener("click", (event) => {
-      const target = event.target;
-      if (target.dataset.action === "remove-home-sample") {
-        target.closest(".list-row").remove();
+      if (handleMoveAction(event)) {
+        return;
+      }
+      const actionTarget = event.target.closest("[data-action]");
+      if (!actionTarget) {
+        return;
+      }
+      if (actionTarget.dataset.action === "remove-home-sample") {
+        actionTarget.closest(".list-row").remove();
       }
     });
   }
@@ -2364,9 +2571,15 @@ const bindEvents = () => {
 
   if (categoriesInputs) {
     categoriesInputs.addEventListener("click", (event) => {
-      const target = event.target;
-      if (target.dataset.action === "remove-category") {
-        target.closest(".list-row").remove();
+      if (handleMoveAction(event)) {
+        return;
+      }
+      const actionTarget = event.target.closest("[data-action]");
+      if (!actionTarget) {
+        return;
+      }
+      if (actionTarget.dataset.action === "remove-category") {
+        actionTarget.closest(".list-row").remove();
         refreshCategoryOptions();
       }
     });
@@ -2376,26 +2589,44 @@ const bindEvents = () => {
   }
 
   collectionsInputs.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.dataset.action === "remove-collection") {
-      target.closest(".list-row").remove();
+    if (handleMoveAction(event)) {
+      return;
+    }
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) {
+      return;
+    }
+    if (actionTarget.dataset.action === "remove-collection") {
+      actionTarget.closest(".list-row").remove();
     }
   });
 
   ingredientsInputs.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.dataset.action === "remove-ingredient") {
-      target.closest(".list-row").remove();
+    if (handleMoveAction(event)) {
+      return;
+    }
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) {
+      return;
+    }
+    if (actionTarget.dataset.action === "remove-ingredient") {
+      actionTarget.closest(".list-row").remove();
     }
   });
 
   testimonialsInputs.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.dataset.action === "remove-testimonial") {
-      target.closest(".list-row").remove();
+    if (handleMoveAction(event)) {
+      return;
     }
-    if (target.dataset.action === "clear-testimonial-image") {
-      const row = target.closest(".list-row");
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) {
+      return;
+    }
+    if (actionTarget.dataset.action === "remove-testimonial") {
+      actionTarget.closest(".list-row").remove();
+    }
+    if (actionTarget.dataset.action === "clear-testimonial-image") {
+      const row = actionTarget.closest(".list-row");
       if (!row) {
         return;
       }
@@ -2412,13 +2643,20 @@ const bindEvents = () => {
       if (fileInput) {
         fileInput.value = "";
       }
+      updateImageSizeLabel(row.querySelector(".image-cell"), "");
     }
   });
 
   statsInputs.addEventListener("click", (event) => {
-    const target = event.target;
-    if (target.dataset.action === "remove-stat") {
-      target.closest(".list-row").remove();
+    if (handleMoveAction(event)) {
+      return;
+    }
+    const actionTarget = event.target.closest("[data-action]");
+    if (!actionTarget) {
+      return;
+    }
+    if (actionTarget.dataset.action === "remove-stat") {
+      actionTarget.closest(".list-row").remove();
     }
   });
 
@@ -2433,16 +2671,17 @@ const bindEvents = () => {
       const preview = row.querySelector(".image-preview");
       const pathInput = row.querySelector("[data-field='image']");
       const dataUrl = await resizeImageFile(file, {
-        maxWidth: 900,
-        maxHeight: 900,
-        mimeType: "image/jpeg",
-        quality: 0.82,
+        maxWidth: 520,
+        maxHeight: 520,
+        mimeType: "image/webp",
+        quality: 0.55,
       });
       row.dataset.imageData = dataUrl;
       preview.src = dataUrl;
       if (pathInput) {
         pathInput.value = "";
       }
+      updateImageSizeLabel(row.querySelector(".image-cell"), dataUrl);
     }
   });
 
@@ -2457,10 +2696,10 @@ const bindEvents = () => {
       const preview = row.querySelector(".image-preview");
       const pathInput = row.querySelector("[data-field='image']");
       const dataUrl = await resizeImageFile(file, {
-        maxWidth: 600,
-        maxHeight: 600,
-        mimeType: "image/jpeg",
-        quality: 0.82,
+        maxWidth: 320,
+        maxHeight: 320,
+        mimeType: "image/webp",
+        quality: 0.5,
       });
       row.dataset.imageData = dataUrl;
       if (preview) {
@@ -2469,6 +2708,7 @@ const bindEvents = () => {
       if (pathInput) {
         pathInput.value = "";
       }
+      updateImageSizeLabel(row.querySelector(".image-cell"), dataUrl);
     }
   });
 

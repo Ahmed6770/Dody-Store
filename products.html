@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ÙƒÙ„ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª | Dody Store</title>
+    <title>كل المنتجات | Dody Store</title>
     <link rel="icon" id="siteFavicon" href="assets/logo.svg" />
     <link rel="stylesheet" href="style.css" />
   </head>
@@ -14,19 +14,19 @@
           <img class="brand-logo" id="brandLogo" src="assets/logo.svg" alt="Dody Store logo" />
           <div class="brand-text">
             <span class="brand-name" id="brandName">Dody Store</span>
-            <span class="brand-tag" id="brandTag">Ø¹Ù†Ø§ÙŠØ© ÙˆÙ…ÙƒÙŠØ§Ø¬ Ø¨Ø¥Ø­Ø³Ø§Ø³ Ø¹ØµØ±ÙŠ</span>
+            <span class="brand-tag" id="brandTag">عناية ومكياج بإحساس عصري</span>
           </div>
         </div>
         <div class="nav-links">
-          <a href="index.html" data-i18n="navHome">Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠØ©</a>
-          <a href="index.html#collections" data-i18n="navBundles">Ø§Ù„Ø¨Ø§Ù‚Ø§Øª</a>
-          <a href="index.html#about" data-i18n="navAbout">Ù‚ØµØªÙ†Ø§</a>
-          <a href="index.html#contact" data-i18n="navContact">ØªÙˆØ§ØµÙ„</a>
+          <a href="index.html" data-i18n="navHome">الرئيسية</a>
+          <a href="index.html#collections" data-i18n="navBundles">الباقات</a>
+          <a href="index.html#about" data-i18n="navAbout">قصتنا</a>
+          <a href="index.html#contact" data-i18n="navContact">تواصل</a>
         </div>
         <div class="nav-cta">
           <button class="ghost lang-toggle" id="langToggle">English</button>
           <button class="cart" id="cartButton" type="button">
-            <span data-i18n="cartBtn">Ø§Ù„Ø³Ù„Ø©</span>
+            <span data-i18n="cartBtn">السلة</span>
             <span class="cart-count" id="cartCount">0</span>
           </button>
         </div>
@@ -35,8 +35,8 @@
 
     <main>
       <section class="page-hero">
-        <h1 data-i18n="productsPageTitle">ÙƒÙ„ Ø§Ù„Ù…Ù†ØªØ¬Ø§Øª</h1>
-        <p data-i18n="productsPageDesc">ÙƒÙ„ Ø§Ù„Ø£ØµÙ†Ø§Ù Ù…ØªØ§Ø­Ø© Ù…Ø¹ ØªÙØ§ØµÙŠÙ„ ÙƒØ§Ù…Ù„Ø© ÙˆØµÙˆØ± ÙˆØ§Ø¶Ø­Ø©.</p>
+        <h1 data-i18n="productsPageTitle">كل المنتجات</h1>
+        <p data-i18n="productsPageDesc">كل الأصناف متاحة مع تفاصيل كاملة وصور واضحة.</p>
         <div class="delivery-note" id="deliveryNote"></div>
       </section>
 
@@ -44,19 +44,19 @@
         <div class="filter-tabs" id="filterTabs" role="tablist"></div>
         <div class="filter-bar">
           <label class="filter-field">
-            <span data-i18n="filterMin">Ø§Ù„Ø³Ø¹Ø± Ù…Ù†</span>
+            <span data-i18n="filterMin">السعر من</span>
             <input type="number" id="minPrice" min="0" />
           </label>
           <label class="filter-field">
-            <span data-i18n="filterMax">Ø§Ù„Ø³Ø¹Ø± Ø¥Ù„Ù‰</span>
+            <span data-i18n="filterMax">السعر إلى</span>
             <input type="number" id="maxPrice" min="0" />
           </label>
           <label class="filter-check">
             <input type="checkbox" id="availableOnly" />
-            <span data-i18n="filterAvailable">Ù…ØªÙˆÙØ± ÙÙ‚Ø·</span>
+            <span data-i18n="filterAvailable">متوفر فقط</span>
           </label>
           <button class="ghost" id="clearFilters" type="button" data-i18n="filterClear">
-            Ù…Ø³Ø­ Ø§Ù„ÙÙ„ØªØ±
+            مسح الفلتر
           </button>
         </div>
         <div class="product-grid" id="productGrid"></div>
@@ -67,32 +67,32 @@
       <div class="footer-grid">
         <div>
           <h3>Dody Store</h3>
-          <p id="footerDesc">Ù…ØªØ¬Ø± Ø¹Ù†Ø§ÙŠØ© Ø¨Ø§Ù„Ø¨Ø´Ø±Ø© ÙˆÙ…ÙƒÙŠØ§Ø¬ Ø¨ØªØ¬Ø±Ø¨Ø© Ø¹Ø±Ø¨ÙŠØ© Ø¹ØµØ±ÙŠØ©.</p>
+          <p id="footerDesc">متجر عناية بالبشرة ومكياج بتجربة عربية عصرية.</p>
         </div>
         <div>
-          <h4 data-i18n="footerServices">Ø®Ø¯Ù…Ø§ØªÙ†Ø§</h4>
+          <h4 data-i18n="footerServices">خدماتنا</h4>
           <ul id="footerServicesList"></ul>
         </div>
         <div>
-          <h4 data-i18n="footerContact">Ø§Ù„ØªÙˆØ§ØµÙ„</h4>
+          <h4 data-i18n="footerContact">التواصل</h4>
           <ul>
-            <li><a id="footerWhatsappLink" href="#" target="_blank" rel="noreferrer">ÙˆØ§ØªØ³Ø§Ø¨</a></li>
-            <li><a id="footerInstaLink" href="#" target="_blank" rel="noreferrer">Ø¥Ù†Ø³ØªØ¬Ø±Ø§Ù…</a></li>
-            <li><a id="footerFacebookLink" href="#" target="_blank" rel="noreferrer">ÙÙŠØ³Ø¨ÙˆÙƒ</a></li>
+            <li><a id="footerWhatsappLink" href="#" target="_blank" rel="noreferrer">واتساب</a></li>
+            <li><a id="footerInstaLink" href="#" target="_blank" rel="noreferrer">إنستجرام</a></li>
+            <li><a id="footerFacebookLink" href="#" target="_blank" rel="noreferrer">فيسبوك</a></li>
           </ul>
         </div>
         <div>
-          <h4 data-i18n="footerHours">Ø³Ø§Ø¹Ø§Øª Ø§Ù„Ø¹Ù…Ù„</h4>
-          <p id="footerHours">ÙƒÙ„ ÙŠÙˆÙ… Ù…Ù† 10 ØµØ¨Ø§Ø­Ù‹Ø§ Ø­ØªÙ‰ 10 Ù…Ø³Ø§Ø¡Ù‹</p>
+          <h4 data-i18n="footerHours">ساعات العمل</h4>
+          <p id="footerHours">كل يوم من 10 صباحًا حتى 10 مساءً</p>
         </div>
       </div>
       <p class="copyright" id="copyright" data-i18n="copyright">
-        Â© 2026 Dody Store. ÙƒÙ„ Ø§Ù„Ø­Ù‚ÙˆÙ‚ Ù…Ø­ÙÙˆØ¸Ø©.
+        &copy; 2026 Dody Store. كل الحقوق محفوظة.
       </p>
     </footer>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <button class="back-to-top" id="backToTop" aria-label="Top">â†‘</button>
+    <button class="back-to-top" id="backToTop" aria-label="Top">&uarr;</button>
 
     <script src="data.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
